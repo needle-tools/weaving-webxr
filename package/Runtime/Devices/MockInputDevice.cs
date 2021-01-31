@@ -7,6 +7,20 @@ using Debug = UnityEngine.Debug;
 
 namespace needle.Weavers.InputDevicesPatch
 {
+	public class XRNodeUsage
+	{
+		public XRNode Node;
+		public InputType InputType;
+		public readonly Delegate ValueCallback;
+
+		public XRNodeUsage(XRNode node, InputType type, Delegate @delegate)
+		{
+			this.Node = node;
+			this.InputType = type;
+			this.ValueCallback = @delegate;
+		}
+	}
+
 	public class MockInputDevice
 	{
 		public ulong Id { get; private set; }
@@ -14,7 +28,7 @@ namespace needle.Weavers.InputDevicesPatch
 		public string Manufacturer { get; set; }
 		public string SerialNumber { get; set; }
 
-		public XRNode Node { get; set; }
+		public XRNode Node { get; }
 		public InputDeviceCharacteristics DeviceCharacteristics { get; set; }
 
 		private static ulong _idCounter;
@@ -26,24 +40,26 @@ namespace needle.Weavers.InputDevicesPatch
 			this.Node = node;
 		}
 
-		public void AddFeature<T>(InputFeatureUsage<T> usage, Func<T> getValue, XRNode node = (XRNode) (-1))
+		public void AddFeature<T>(InputFeatureUsage<T> usage, Func<T> getValue, XRNodeUsage xrNodeUsage = null)
 		{
 			var usg = (InputFeatureUsage) usage;
 			if (!_registry.ContainsKey(usg))
 				_registry.Add(usg, getValue);
 			else
-			{
 				_registry[usg] = getValue;
-			}
 
-			if (node != (XRNode) (-1))
+			xrNodeUsage ??= usg.GetXRNodeUsage(getValue, Node);
+			if (xrNodeUsage == null)
 			{
-				if (!_nodes.ContainsKey(node)) _nodes.Add(node, new List<Delegate>());
-				_nodes[node].Add(getValue);
+				Debug.LogWarning("Could not derive XRNode usage from " + usage.name + ". Please provide explicitly");
+				return;
 			}
+			if (!_xrNodeUsages.Contains(xrNodeUsage))
+				_xrNodeUsages.Add(xrNodeUsage);
 		}
 
-		private readonly Dictionary<XRNode, List<Delegate>> _nodes = new Dictionary<XRNode, List<Delegate>>();
+
+		private readonly List<XRNodeUsage> _xrNodeUsages = new List<XRNodeUsage>();
 		private readonly Dictionary<InputFeatureUsage, Delegate> _registry = new Dictionary<InputFeatureUsage, Delegate>();
 
 
@@ -88,30 +104,49 @@ namespace needle.Weavers.InputDevicesPatch
 				uniqueID = this.Id,
 			};
 			nodes.Add(state);
-			// TODO: this architecture does not support velocity etc......
-			foreach (var node in _nodes)
+			
+			foreach (var node in _xrNodeUsages)
 			{
-				state.nodeType = node.Key;
-				foreach (var del in node.Value)
+				try
 				{
-					try
+					state.nodeType = node.Node;
+					var val = node.ValueCallback.DynamicInvoke();
+					switch (node.InputType)
 					{
-						var val = del.DynamicInvoke();
-						switch (val)
-						{
-							case Vector3 vec:
-								state.position = vec;
-								break;
-							case Quaternion rot:
-								state.rotation = rot;
-								break;
-						}
+						case InputType.Unknown:
+							break;
+						case InputType.Position:
+							state.position = (Vector3) val;
+							break;
+						case InputType.Rotation:
+							state.rotation = (Quaternion) val;
+							break;
+						case InputType.Velocity:
+							state.velocity = (Vector3) val;
+							break;
+						case InputType.AngularVelocity:
+							state.angularVelocity = (Vector3) val;
+							break;
+						case InputType.Acceleration:
+							state.acceleration = (Vector3) val;
+							break;
+						case InputType.AngularAcceleration:
+							state.angularAcceleration = (Vector3) val;
+							break;
+						case InputType.Tracked:
+							state.tracked = (bool) val;
+							break;
+						default:
+							throw new ArgumentOutOfRangeException();
 					}
-					catch (Exception e)
-					{
-						Debug.LogError(e);
-					}
+					nodes.Add(state);
 				}
+				catch (Exception e)
+				{
+					Debug.LogException(e);
+				}
+				
+
 				nodes.Add(state);
 			}
 		}

@@ -20,33 +20,19 @@ namespace _Tests.Weaver_InputDevice
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
 		private static void Init()
 		{
-			var deviceName = "<XRHMD>";
-			device = new MockInputDevice(deviceName, XRNode.Head);
-			device.SerialNumber = "0.0.1";
-			device.Manufacturer = "Needle";
-			device.DeviceCharacteristics = InputDeviceCharacteristics.HeadMounted | InputDeviceCharacteristics.TrackedDevice;
-
 			XRInputSubsystem_Patch.SupportedTrackingOriginMode = TrackingOriginModeFlags.Device | TrackingOriginModeFlags.Floor;
-
-			device.AddFeature(new InputFeatureUsage<bool>("isTracked"), () => true);
-			device.AddFeature(new InputFeatureUsage<InputTrackingState>("trackingState"), () => InputTrackingState.Position | InputTrackingState.Rotation);
-			device.AddFeature(new InputFeatureUsage<Vector3>("devicePosition"), () => Random.insideUnitSphere);
-			device.AddFeature(new InputFeatureUsage<Quaternion>("deviceRotation"), () => Random.rotation);
-
-			device.AddFeature(new InputFeatureUsage<Vector3>("leftEyePosition"), () => Random.insideUnitSphere * .3f, XRNode.LeftEye);
-			device.AddFeature(new InputFeatureUsage<Quaternion>("leftEyeRotation"), () => Random.rotation, XRNode.LeftEye);
-			device.AddFeature(new InputFeatureUsage<Vector3>("rightEyePosition"), () => Random.insideUnitSphere * .3f, XRNode.RightEye);
-			device.AddFeature(new InputFeatureUsage<Quaternion>("rightEyeRotation"), () => Random.rotation, XRNode.RightEye);
-			device.AddFeature(new InputFeatureUsage<Vector3>("centerEyePosition"), () => Vector3.LerpUnclamped(Vector3.zero, Vector3.up, Mathf.Sin(Time.time)), XRNode.CenterEye);
-			device.AddFeature(new InputFeatureUsage<Quaternion>("centerEyeRotation"), () => _rotation, XRNode.CenterEye);
-			
-			XRInputSubsystem_Patch.RegisterInputDevice(device);
+			XRInputSubsystem_Patch.RegisterInputDevice(MockDeviceBuilder.CreateHeadset(
+					() => true,
+					() => Vector3.LerpUnclamped(Vector3.zero, Vector3.up * .5f, Mathf.Sin(Time.time)),
+					() => _rotation
+				)
+			);
 			XRInputSubsystem_Patch.Instance.Start();
 		}
 
 		private void Update()
 		{
-			_rotation = Quaternion.Lerp(Quaternion.Euler(0,-20, 0), Quaternion.Euler(0,20,0), Mathf.Sin(Time.time) * .5f + .5f);
+			_rotation = Quaternion.Lerp(Quaternion.Euler(0, -20, 0), Quaternion.Euler(0, 20, 0), Mathf.Sin(Time.time) * .5f + .5f);
 			PrintDeviceList();
 		}
 
@@ -59,9 +45,9 @@ namespace _Tests.Weaver_InputDevice
 			var list = new List<InputDevice>();
 			InputDevices.GetDevices(list);
 			var headDevice = InputDevices.GetDeviceAtXRNode(XRNode.Head);
-			
+
 			XRInputSubsystem_Patch.CurrentTrackingMode = Random.value > .5 ? TrackingOriginModeFlags.Device : TrackingOriginModeFlags.Floor;
-			
+
 			if (Text)
 			{
 				Text.text = "Frame=" + Time.frameCount;
