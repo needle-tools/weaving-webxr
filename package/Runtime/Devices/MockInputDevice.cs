@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.XR;
 using Debug = UnityEngine.Debug;
@@ -27,6 +28,7 @@ namespace needle.Weavers.InputDevicesPatch
 		public string Name { get; private set; }
 		public string Manufacturer { get; set; }
 		public string SerialNumber { get; set; }
+		public bool DebugLog = false;
 
 		public XRNode Node { get; }
 		public InputDeviceCharacteristics DeviceCharacteristics { get; set; }
@@ -44,9 +46,19 @@ namespace needle.Weavers.InputDevicesPatch
 		{
 			var usg = (InputFeatureUsage) usage;
 			if (!_registry.ContainsKey(usg))
+			{
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+				if (DebugLog) Debug.Log(Name + " add feature usage: " + usg.name);
+#endif
 				_registry.Add(usg, getValue);
+			}
 			else
+			{
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+				if (DebugLog) Debug.Log(Name + " update feature usage: " + usg.name);
+#endif
 				_registry[usg] = getValue;
+			}
 
 			xrNodeUsage ??= usg.GetXRNodeUsage(getValue, Node);
 			if (xrNodeUsage == null)
@@ -54,8 +66,15 @@ namespace needle.Weavers.InputDevicesPatch
 				Debug.LogWarning("Could not derive XRNode usage from " + usage.name + ". Please provide explicitly");
 				return;
 			}
+
 			if (!_xrNodeUsages.Contains(xrNodeUsage))
+			{
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+				if (DebugLog) Debug.Log(Name + " add node usage: " + xrNodeUsage.Node + ", " + xrNodeUsage.InputType);
+#endif
+
 				_xrNodeUsages.Add(xrNodeUsage);
+			}
 		}
 
 
@@ -65,7 +84,10 @@ namespace needle.Weavers.InputDevicesPatch
 
 		public bool TryGetUsage<T>(string name, out T value)
 		{
-			Debug.Log("try Get usage " + name);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+			if (DebugLog)
+				Debug.Log(Name + " - Try Get Usage " + name + " - " + typeof(T));
+#endif
 			foreach (var kvp in _registry)
 			{
 				var usage = kvp.Key;
@@ -73,7 +95,11 @@ namespace needle.Weavers.InputDevicesPatch
 				{
 					try
 					{
-						value = (T)kvp.Value.DynamicInvoke();
+						value = (T) kvp.Value.DynamicInvoke();
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+						if (DebugLog)
+							Debug.Log("Value = " + value);
+#endif
 						return true;
 					}
 					catch (Exception e)
@@ -93,21 +119,23 @@ namespace needle.Weavers.InputDevicesPatch
 			return true;
 		}
 
-		public void TryGetNodes(List<XRNodeState> nodes)
+		public void TryGetNodes(List<XRNodeState> states)
 		{
 			var state = new XRNodeState()
 			{
 				nodeType = Node,
 				uniqueID = this.Id,
+				tracked = true
 			};
-			nodes.Add(state);
-			
+			states.Add(state);
+
 			foreach (var node in _xrNodeUsages)
 			{
 				try
 				{
 					state.nodeType = node.Node;
 					state.uniqueID = this.Id;
+					state.tracked = true;
 					var val = node.ValueCallback.DynamicInvoke();
 					switch (node.InputType)
 					{
@@ -137,14 +165,29 @@ namespace needle.Weavers.InputDevicesPatch
 						default:
 							throw new ArgumentOutOfRangeException();
 					}
-					nodes.Add(state);
+
+					states.Add(state);
 				}
 				catch (Exception e)
 				{
 					Debug.LogException(e);
 				}
-				
 			}
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+			if (DebugLog)
+			{
+				try
+				{
+					var log = string.Join("\n", states.Select(s => s.nodeType + " - " + s.uniqueID + " - " + s));
+					Debug.Log(Name + ", " + Id + "\n" + log);
+				}
+				catch
+				{
+					// ignored
+				}
+			}
+#endif
 		}
 	}
 }

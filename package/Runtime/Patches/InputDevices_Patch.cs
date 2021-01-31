@@ -38,12 +38,11 @@ namespace needle.Weavers.InputDevicesPatch
 			{
 				if (d.name == mock.Name)
 				{
-					Debug.Log("Found" + node + ", " + d.name);
 					return d;
 				}
 			}
 
-			Debug.Log("Could not find " + node + ", " + ", " + mock?.Name);
+			Debug.LogWarning("Could not find " + node + ", " + ", " + mock?.Name);
 			return new InputDevice();
 		}
 
@@ -52,6 +51,20 @@ namespace needle.Weavers.InputDevicesPatch
 			XRInputSubsystem_Patch.Instance.TryGetInputDevices(inputDevices);
 		}
 
+		
+		private static bool IsDeviceValid(ulong deviceId)
+		{
+			return _inputDevices.Any(d => deviceId == d.Id);
+		}
+
+		internal static string GetDeviceName(ulong deviceId) => XRInputSubsystem_Patch.TryGetDevice(deviceId)?.Name;
+
+		internal static string GetDeviceManufacturer(ulong deviceId) => XRInputSubsystem_Patch.TryGetDevice(deviceId)?.Manufacturer;
+
+		internal static string GetDeviceSerialNumber(ulong deviceId) => XRInputSubsystem_Patch.TryGetDevice(deviceId)?.SerialNumber;
+
+		internal static InputDeviceCharacteristics GetDeviceCharacteristics(ulong deviceId) => XRInputSubsystem_Patch.TryGetDevice(deviceId).DeviceCharacteristics;
+		
 
 		internal static bool TryGetFeatureUsages(ulong deviceId, List<InputFeatureUsage> featureUsages)
 		{
@@ -235,20 +248,5 @@ namespace needle.Weavers.InputDevicesPatch
 			value = default;
 			return dev != null && dev.TryGetUsage(usage, out value);
 		}
-
-
-		private static bool IsDeviceValid(ulong deviceId)
-		{
-			return _inputDevices.Any(d => deviceId == d.Id);
-		}
-
-		internal static string GetDeviceName(ulong deviceId) => XRInputSubsystem_Patch.TryGetDevice(deviceId)?.Name;
-
-		internal static string GetDeviceManufacturer(ulong deviceId) => XRInputSubsystem_Patch.TryGetDevice(deviceId)?.Manufacturer;
-
-
-		internal static string GetDeviceSerialNumber(ulong deviceId) => XRInputSubsystem_Patch.TryGetDevice(deviceId)?.SerialNumber;
-
-		internal static InputDeviceCharacteristics GetDeviceCharacteristics(ulong deviceId) => XRInputSubsystem_Patch.TryGetDevice(deviceId).DeviceCharacteristics;
 	}
 }

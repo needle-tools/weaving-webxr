@@ -23,6 +23,7 @@ namespace needle.Weavers.InputDevicesPatch
 
 		private static ulong GetDeviceIdAtXRNode(XRNode node)
 		{
+			Debug.Log("Search " + node);
 			var devices = XRInputSubsystem_Patch.InputDevices;
 			foreach (var device in devices)
 			{
@@ -33,7 +34,7 @@ namespace needle.Weavers.InputDevicesPatch
 				}
 			}
 			Debug.Log("could not find " + node + ", " + devices);
-			return 0;
+			return long.MaxValue;
 		}
 
 		internal static void GetDeviceIdsAtXRNode_Internal(XRNode node, List<ulong> deviceIds)

@@ -33,13 +33,18 @@ namespace needle.Weavers.InputDevicesPatch
 			return CreateController(XRNode.RightHand, isTrackedCallback, positionCallback, rotationCallback, stateCallback);
 		}
 		
+		public static MockInputDevice CreateLeftController(Func<bool> isTrackedCallback, Func<Vector3> positionCallback, Func<Quaternion> rotationCallback, Func<InputTrackingState> stateCallback = null)
+		{
+			return CreateController(XRNode.LeftHand, isTrackedCallback, positionCallback, rotationCallback, stateCallback);
+		}
+		
 		private static MockInputDevice CreateController(XRNode node, Func<bool> isTrackedCallback, Func<Vector3> positionCallback, Func<Quaternion> rotationCallback, Func<InputTrackingState> stateCallback = null)
 		{
 			var device = new MockInputDevice("<XRController>", node)
 			{
 				SerialNumber = "1.0.0",
 				Manufacturer = "Needle",
-				DeviceCharacteristics = InputDeviceCharacteristics.HeadMounted | InputDeviceCharacteristics.TrackedDevice
+				DeviceCharacteristics = InputDeviceCharacteristics.TrackedDevice | InputDeviceCharacteristics.HeldInHand | InputDeviceCharacteristics.Controller
 			};
 
 			device.AddFeature(CommonUsages.isTracked, isTrackedCallback);

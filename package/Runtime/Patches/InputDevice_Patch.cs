@@ -6,24 +6,7 @@ namespace needle.Weavers.InputDevicesPatch
 	[NeedlePatch(typeof(InputDevice))]
 	public class InputDevice_Patch
 	{
-		// private ulong m_DeviceId = ulong.MaxValue;
-		// private bool m_Initialized;
-		
 		public XRInputSubsystem subsystem => XRInputSubsystem_Patch.Instance;
-		
-		// [NeedlePatch]
-		// internal InputDevice_Patch(ulong deviceId)
-		// {
-		// 	this.m_DeviceId = deviceId;
-		// 	this.m_Initialized = true;
-		// }
-		
-		// private bool isValid => true;
-		// private bool IsValidId()
-		// {
-		// 	return XRInputSubsystem_Patch.TryGetDevice(m_DeviceId) != null;;
-		// }
-
-		// private string name => XRInputSubsystem_Patch.TryGetDevice(m_DeviceId)?.Name;
+		// the rest is automatically set correctly because we implement XRInputSubsystem.TryGetDeviceIds_AsList
 	}
 }

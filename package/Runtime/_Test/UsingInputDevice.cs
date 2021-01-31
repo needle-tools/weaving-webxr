@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using needle.Weavers.InputDevicesPatch;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,17 +21,24 @@ namespace _Tests.Weaver_InputDevice
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
 		private static void Init()
 		{
-			XRInputSubsystem_Patch.SupportedTrackingOriginMode = TrackingOriginModeFlags.Device | TrackingOriginModeFlags.Floor;
 			XRInputSubsystem_Patch.RegisterInputDevice(MockDeviceBuilder.CreateHeadset(
 					() => true,
-					() => Vector3.LerpUnclamped(Vector3.zero, Vector3.up * .5f, Mathf.Sin(Time.time)),
+					() => Vector3.LerpUnclamped(new Vector3(0,0,-.5f), Vector3.up * .2f, Mathf.Sin(Time.time)),
 					() => _rotation
 				)
 			);
-			XRInputSubsystem_Patch.RegisterInputDevice(MockDeviceBuilder.CreateRightController(() => true,
-				() => Random.insideUnitSphere,
-				() => Random.rotation)
-			);
+			var rightController = MockDeviceBuilder.CreateRightController(() => true,
+				() => Vector3.LerpUnclamped(Vector3.zero, Vector3.down * .2f, Mathf.Sin(Time.time * 2f)),
+				() => Quaternion.Euler(20, 20, 20));
+			XRInputSubsystem_Patch.RegisterInputDevice(rightController);
+			var leftController = MockDeviceBuilder.CreateLeftController(() => true,
+				() => Vector3.LerpUnclamped(Vector3.zero, Vector3.right * .5f, Mathf.Sin(Time.time * 5f)),
+				() => Quaternion.identity);
+			XRInputSubsystem_Patch.RegisterInputDevice(leftController);
+
+			leftController.DebugLog = rightController.DebugLog = true;
+			
+			XRInputSubsystem_Patch.SupportedTrackingOriginMode = TrackingOriginModeFlags.Device | TrackingOriginModeFlags.Floor;
 			XRInputSubsystem_Patch.Instance.Start();
 		}
 
@@ -58,11 +66,7 @@ namespace _Tests.Weaver_InputDevice
 				Text.text += $"\nFound {list.Count} InputDevices";
 				Text.text += "\n Has Head device... " + headDevice.name + " = " + headDevice.isValid + ", " + headDevice.manufacturer + ", " +
 				             headDevice.serialNumber;
-
-				var val = headDevice.TryGetFeatureValue(new InputFeatureUsage<Vector3>("centerEyePosition"), out var v3);
-				var val2 = headDevice.TryGetFeatureValue(new InputFeatureUsage<Quaternion>("centerEyeRotation"), out var rot2);
-				Text.text += "\n" + "vec3: " + v3 + " == " + val;
-				Text.text += "\n" + "rot: " + val2 + " == " + rot2.eulerAngles;
+				
 				if (headDevice.subsystem != null)
 				{
 					headDevice.subsystem.boundaryChanged += b => lastFrameReceivedEvent = Time.frameCount;
@@ -79,7 +83,7 @@ namespace _Tests.Weaver_InputDevice
 				Text.text += "\nSubsystems?: " + subsystems.Count + "\n" + string.Join("\n", subsystems);
 			}
 
-			Debug.Log("InputDevices: " + list.Count + "\n" + string.Join("\n", list.Select(e => { return e.name; })));
+			Debug.Log("InputDevices: " + list.Count + "\n" + string.Join("\n", list.Select(e => e.name + ", " + e.GetType().GetField("m_DeviceId", (BindingFlags)~0)?.GetValue(e))));
 		}
 	}
 }
