@@ -14,6 +14,8 @@ namespace needle.Weavers.InputDevicesPatch
 	{
 		private static void GetNodeStates_Internal(List<XRNodeState> nodeStates)
 		{
+			nodeStates.Clear();
+			
 			var devices = XRInputSubsystem_Patch.InputDevices;
 			foreach (var device in devices)
 			{
@@ -39,6 +41,8 @@ namespace needle.Weavers.InputDevicesPatch
 
 		internal static void GetDeviceIdsAtXRNode_Internal(XRNode node, List<ulong> deviceIds)
 		{
+			deviceIds.Clear();
+			
 			var devices = XRInputSubsystem_Patch.InputDevices;
 			foreach (var device in devices)
 			{

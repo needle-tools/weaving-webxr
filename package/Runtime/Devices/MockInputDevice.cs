@@ -86,7 +86,7 @@ namespace needle.Weavers.InputDevicesPatch
 		{
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 			if (DebugLog)
-				Debug.Log(Name + " - Try Get Usage " + name + " - " + typeof(T));
+				Debug.Log(Name + " - " + Node + " - Try Get Usage " + name + " - " + typeof(T));
 #endif
 			foreach (var kvp in _registry)
 			{
