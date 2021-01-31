@@ -1,5 +1,4 @@
 using needle.Weaver;
-using UnityEngine;
 using UnityEngine.XR;
 
 namespace needle.Weavers.InputDevicesPatch
@@ -7,7 +6,7 @@ namespace needle.Weavers.InputDevicesPatch
 	[NeedlePatch(typeof(InputDevice))]
 	public class InputDevice_Patch
 	{
-		private ulong m_DeviceId = default;
+		// private ulong m_DeviceId = ulong.MaxValue;
 		// private bool m_Initialized;
 		
 		public XRInputSubsystem subsystem => XRInputSubsystem_Patch.Instance;
@@ -20,7 +19,10 @@ namespace needle.Weavers.InputDevicesPatch
 		// }
 		
 		// private bool isValid => true;
-		private bool IsValidId() => XRInputSubsystem_Patch.TryGetDevice(m_DeviceId) != null;
+		// private bool IsValidId()
+		// {
+		// 	return XRInputSubsystem_Patch.TryGetDevice(m_DeviceId) != null;;
+		// }
 
 		// private string name => XRInputSubsystem_Patch.TryGetDevice(m_DeviceId)?.Name;
 	}

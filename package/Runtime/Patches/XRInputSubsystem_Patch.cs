@@ -67,6 +67,7 @@ namespace needle.Weavers.InputDevicesPatch
 			
 		}
 		
+		// this is used to build the "InputDevice" list, called from InputDevices
 		internal void TryGetDeviceIds_AsList(List<ulong> deviceIds)
 		{
 			foreach (var dev in InputDevices) 

@@ -10,22 +10,27 @@ namespace needle.Weavers.InputDevicesPatch
 		/// </summary>
 		public static XRNodeUsage GetXRNodeUsage(this InputFeatureUsage usage, Delegate callback, XRNode device)
 		{
+			// refer to CommonUsages to naming
 			switch (usage.name)
 			{
-				case "isTracked":
+				case "IsTracked":
 					return new XRNodeUsage(device, InputType.Tracked, callback);
-				case "leftEyePosition":
+				case "LeftEyePosition":
 					return new XRNodeUsage(XRNode.LeftEye, InputType.Position, callback);
-				case "leftEyeRotation":
+				case "LeftEyeRotation":
 					return new XRNodeUsage(XRNode.LeftEye, InputType.Rotation, callback);
-				case "rightEyePosition":
+				case "RightEyePosition":
 					return new XRNodeUsage(XRNode.RightEye, InputType.Position, callback);
-				case "rightEyeRotation":
+				case "RightEyeRotation":
 					return new XRNodeUsage(XRNode.RightEye, InputType.Rotation, callback);
-				case "centerEyePosition":
+				case "CenterEyePosition":
 					return new XRNodeUsage(XRNode.CenterEye, InputType.Position, callback);
-				case "centerEyeRotation":
+				case "CenterEyeRotation":
 					return new XRNodeUsage(XRNode.CenterEye, InputType.Rotation, callback);
+				case "DevicePosition":
+					return new XRNodeUsage(device, InputType.Position, callback);
+				case "DeviceRotation":
+					return new XRNodeUsage(device, InputType.Rotation, callback);
 			}
 
 			return null;

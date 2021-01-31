@@ -6,26 +6,46 @@ namespace needle.Weavers.InputDevicesPatch
 {
 	public class MockDeviceBuilder
 	{
-		public static MockInputDevice CreateHeadset(Func<bool> isTrackedCallback, Func<Vector3> positionCallback, Func<Quaternion> rotationCallback)
+		public static MockInputDevice CreateHeadset(Func<bool> isTrackedCallback, Func<Vector3> positionCallback, Func<Quaternion> rotationCallback, Func<InputTrackingState> stateCallback = null)
 		{
-			var deviceName = "<XRHMD>";
-			var device = new MockInputDevice(deviceName, XRNode.Head)
+			var device = new MockInputDevice("<XRHMD>", XRNode.Head)
 			{
 				SerialNumber = "1.0.0",
 				Manufacturer = "Needle",
 				DeviceCharacteristics = InputDeviceCharacteristics.HeadMounted | InputDeviceCharacteristics.TrackedDevice
 			};
 
-			device.AddFeature(new InputFeatureUsage<bool>("isTracked"), isTrackedCallback);
-			device.AddFeature(new InputFeatureUsage<InputTrackingState>("trackingState"), () => InputTrackingState.Position | InputTrackingState.Rotation);
-			device.AddFeature(new InputFeatureUsage<Vector3>("devicePosition"), positionCallback);
-			device.AddFeature(new InputFeatureUsage<Quaternion>("deviceRotation"), rotationCallback);
-			device.AddFeature(new InputFeatureUsage<Vector3>("leftEyePosition"), positionCallback);
-			device.AddFeature(new InputFeatureUsage<Quaternion>("leftEyeRotation"), rotationCallback);
-			device.AddFeature(new InputFeatureUsage<Vector3>("rightEyePosition"), positionCallback);
-			device.AddFeature(new InputFeatureUsage<Quaternion>("rightEyeRotation"), rotationCallback);
-			device.AddFeature(new InputFeatureUsage<Vector3>("centerEyePosition"), positionCallback);
-			device.AddFeature(new InputFeatureUsage<Quaternion>("centerEyeRotation"), rotationCallback);
+			device.AddFeature(CommonUsages.isTracked, isTrackedCallback);
+			device.AddFeature(CommonUsages.trackingState,  stateCallback ?? (() => InputTrackingState.Position | InputTrackingState.Rotation));
+			device.AddFeature(CommonUsages.devicePosition, positionCallback);
+			device.AddFeature(CommonUsages.deviceRotation, rotationCallback);
+			device.AddFeature(CommonUsages.leftEyePosition, positionCallback);
+			device.AddFeature(CommonUsages.leftEyeRotation, rotationCallback);
+			device.AddFeature(CommonUsages.rightEyePosition, positionCallback);
+			device.AddFeature(CommonUsages.rightEyeRotation, rotationCallback);
+			device.AddFeature(CommonUsages.centerEyePosition, positionCallback);
+			device.AddFeature(CommonUsages.centerEyeRotation, rotationCallback);
+			return device;
+		}
+		
+		public static MockInputDevice CreateRightController(Func<bool> isTrackedCallback, Func<Vector3> positionCallback, Func<Quaternion> rotationCallback, Func<InputTrackingState> stateCallback = null)
+		{
+			return CreateController(XRNode.RightHand, isTrackedCallback, positionCallback, rotationCallback, stateCallback);
+		}
+		
+		private static MockInputDevice CreateController(XRNode node, Func<bool> isTrackedCallback, Func<Vector3> positionCallback, Func<Quaternion> rotationCallback, Func<InputTrackingState> stateCallback = null)
+		{
+			var device = new MockInputDevice("<XRController>", node)
+			{
+				SerialNumber = "1.0.0",
+				Manufacturer = "Needle",
+				DeviceCharacteristics = InputDeviceCharacteristics.HeadMounted | InputDeviceCharacteristics.TrackedDevice
+			};
+
+			device.AddFeature(CommonUsages.isTracked, isTrackedCallback);
+			device.AddFeature(CommonUsages.trackingState, stateCallback ?? (() => InputTrackingState.Position | InputTrackingState.Rotation));
+			device.AddFeature(CommonUsages.devicePosition, positionCallback);
+			device.AddFeature(CommonUsages.deviceRotation, rotationCallback);
 			return device;
 		}
 	}

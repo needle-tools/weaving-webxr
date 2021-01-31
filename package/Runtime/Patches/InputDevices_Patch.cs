@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -32,7 +33,18 @@ namespace needle.Weavers.InputDevicesPatch
 			var mock = _inputDevices.FirstOrDefault(d => d.Node == node);
 			if (mock == null || !XRInputSubsystem_Patch.Instance.TryGetInputDevices(_buffer))
 				return new InputDevice();
-			return _buffer.FirstOrDefault(d => d.name == mock?.Name);
+			
+			foreach (var d in _buffer)
+			{
+				if (d.name == mock.Name)
+				{
+					Debug.Log("Found" + node + ", " + d.name);
+					return d;
+				}
+			}
+
+			Debug.Log("Could not find " + node + ", " + ", " + mock?.Name);
+			return new InputDevice();
 		}
 
 		private static void GetDevices_Internal(List<InputDevice> inputDevices)

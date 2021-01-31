@@ -65,23 +65,20 @@ namespace needle.Weavers.InputDevicesPatch
 
 		public bool TryGetUsage<T>(string name, out T value)
 		{
-			// Debug.Log("try Get usage " + name);
+			Debug.Log("try Get usage " + name);
 			foreach (var kvp in _registry)
 			{
 				var usage = kvp.Key;
-				if (usage.name == name && usage.type == typeof(T))
+				if (usage.name == name)
 				{
-					if (kvp.Value is Func<T> callback)
+					try
 					{
-						try
-						{
-							value = callback.Invoke();
-							return true;
-						}
-						catch (Exception e)
-						{
-							Debug.LogException(e);
-						}
+						value = (T)kvp.Value.DynamicInvoke();
+						return true;
+					}
+					catch (Exception e)
+					{
+						Debug.LogException(e);
 					}
 				}
 			}
@@ -110,6 +107,7 @@ namespace needle.Weavers.InputDevicesPatch
 				try
 				{
 					state.nodeType = node.Node;
+					state.uniqueID = this.Id;
 					var val = node.ValueCallback.DynamicInvoke();
 					switch (node.InputType)
 					{
@@ -146,8 +144,6 @@ namespace needle.Weavers.InputDevicesPatch
 					Debug.LogException(e);
 				}
 				
-
-				nodes.Add(state);
 			}
 		}
 	}

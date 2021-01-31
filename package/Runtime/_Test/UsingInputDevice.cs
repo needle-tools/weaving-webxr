@@ -27,6 +27,10 @@ namespace _Tests.Weaver_InputDevice
 					() => _rotation
 				)
 			);
+			XRInputSubsystem_Patch.RegisterInputDevice(MockDeviceBuilder.CreateRightController(() => true,
+				() => Random.insideUnitSphere,
+				() => Random.rotation)
+			);
 			XRInputSubsystem_Patch.Instance.Start();
 		}
 
@@ -46,7 +50,7 @@ namespace _Tests.Weaver_InputDevice
 			InputDevices.GetDevices(list);
 			var headDevice = InputDevices.GetDeviceAtXRNode(XRNode.Head);
 
-			XRInputSubsystem_Patch.CurrentTrackingMode = Random.value > .5 ? TrackingOriginModeFlags.Device : TrackingOriginModeFlags.Floor;
+			// XRInputSubsystem_Patch.CurrentTrackingMode = Random.value > .5 ? TrackingOriginModeFlags.Device : TrackingOriginModeFlags.Floor;
 
 			if (Text)
 			{
