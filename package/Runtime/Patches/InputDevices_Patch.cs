@@ -12,7 +12,7 @@ namespace needle.Weavers.InputDevicesPatch
 	public class InputDevices_Patch
 	{
 		private static readonly List<InputDevice> _buffer = new List<InputDevice>();
-		private static IEnumerable<MockInputDevice> _inputDevices => XRInputSubsystem_Patch.InputDevices;
+		private static IList<MockInputDevice> _inputDevices => XRInputSubsystem_Patch.InputDevices;
 
 		public enum ConnectionChangeType : uint
 		{
@@ -30,19 +30,18 @@ namespace needle.Weavers.InputDevicesPatch
 
 		private static InputDevice GetDeviceAtXRNode(XRNode node)
 		{
-			var mock = _inputDevices.FirstOrDefault(d => d.Node == node);
-			if (mock == null || !XRInputSubsystem_Patch.Instance.TryGetInputDevices(_buffer))
-				return new InputDevice();
-			
-			foreach (var d in _buffer)
+			if (_buffer.Count != _inputDevices.Count) XRInputSubsystem_Patch.Instance.TryGetInputDevices(_buffer);
+
+			for (var index = 0; index < _inputDevices.Count && index < _buffer.Count; index++)
 			{
-				if (d.name == mock.Name)
+				var dev = _inputDevices[index];
+				if (dev.Node == node)
 				{
-					return d;
+					return _buffer[index];
 				}
 			}
 
-			Debug.LogWarning("Could not find " + node + ", " + ", " + mock?.Name);
+			Debug.LogWarning("Could not find device at " + node);
 			return new InputDevice();
 		}
 

@@ -27,16 +27,19 @@ namespace _Tests.Weaver_InputDevice
 					() => _rotation
 				)
 			);
-			var rightController = MockDeviceBuilder.CreateRightController(() => true,
+			var rightController = MockDeviceBuilder.CreateRightController(
+				() => true,
 				() => Vector3.LerpUnclamped(Vector3.zero, Vector3.down * .2f, Mathf.Sin(Time.time * 2f)),
 				() => Quaternion.Euler(20, 20, 20));
 			XRInputSubsystem_Patch.RegisterInputDevice(rightController);
-			var leftController = MockDeviceBuilder.CreateLeftController(() => true,
+			
+			var leftController = MockDeviceBuilder.CreateLeftController(
+				() => true,
 				() => Vector3.LerpUnclamped(Vector3.zero, Vector3.right * .5f, Mathf.Sin(Time.time * 5f)),
 				() => Quaternion.identity);
 			XRInputSubsystem_Patch.RegisterInputDevice(leftController);
 
-			leftController.DebugLog = rightController.DebugLog = true;
+			// leftController.DebugLog = rightController.DebugLog = true;
 			
 			XRInputSubsystem_Patch.SupportedTrackingOriginMode = TrackingOriginModeFlags.Device | TrackingOriginModeFlags.Floor;
 			XRInputSubsystem_Patch.Instance.Start();
