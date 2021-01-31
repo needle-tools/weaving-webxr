@@ -25,17 +25,14 @@ namespace needle.Weavers.InputDevicesPatch
 
 		private static ulong GetDeviceIdAtXRNode(XRNode node)
 		{
-			Debug.Log("Search " + node);
 			var devices = XRInputSubsystem_Patch.InputDevices;
 			foreach (var device in devices)
 			{
 				if (device.Node == node)
 				{
-					Debug.Log("found " + node + ", " + device.Id);
 					return device.Id;
 				}
 			}
-			Debug.Log("could not find " + node + ", " + devices);
 			return long.MaxValue;
 		}
 
@@ -48,11 +45,9 @@ namespace needle.Weavers.InputDevicesPatch
 			{
 				if (device.Node == node)
 				{
-					Debug.Log("Found " + device.Id);
 					deviceIds.Add(device.Id);
 				}
 			}
-			Debug.Log(node + " found " + deviceIds.Count);
 		}
 
 		public static void Recenter()

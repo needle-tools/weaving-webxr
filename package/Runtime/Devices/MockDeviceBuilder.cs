@@ -40,7 +40,7 @@ namespace needle.Weavers.InputDevicesPatch
 		
 		private static MockInputDevice CreateController(XRNode node, Func<bool> isTrackedCallback, Func<Vector3> positionCallback, Func<Quaternion> rotationCallback, Func<InputTrackingState> stateCallback = null)
 		{
-			var device = new MockInputDevice("<XRController/" + node + ">", node)
+			var device = new MockInputDevice("<XRController>", node)
 			{
 				SerialNumber = "1.0.0",
 				Manufacturer = "Needle",
