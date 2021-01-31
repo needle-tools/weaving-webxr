@@ -1,7 +1,7 @@
 using System;
 using UnityEngine.XR;
 
-namespace needle.Weavers.InputDevicesPatch
+namespace needle.weaver.webxr
 {
 	public static class InputUsageConverter
 	{

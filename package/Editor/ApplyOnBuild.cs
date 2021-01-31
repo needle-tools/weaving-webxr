@@ -3,7 +3,7 @@ using needle.Weaver;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
-namespace Fody.Weavers.InputDeviceWeaver
+namespace needle.weaver.webxr
 {
 	internal class ApplyOnBuild : IPreprocessBuildWithReport
 	{

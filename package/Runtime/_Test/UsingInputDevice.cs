@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using needle.Weavers.InputDevicesPatch;
+using needle.weaver.webxr;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR;
-using Random = UnityEngine.Random;
 
-namespace _Tests.Weaver_InputDevice
+namespace needle.weaver.webxr
 {
 	[ExecuteInEditMode]
 	public class UsingInputDevice : MonoBehaviour

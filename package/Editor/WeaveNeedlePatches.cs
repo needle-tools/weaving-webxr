@@ -6,7 +6,7 @@ using needle.Weaver;
 using UnityEngine;
 using TypeCache = UnityEditor.TypeCache;
 
-namespace Patch.InputDevices.Editor
+namespace needle.weaver.webxr
 {
 	public class WeaveNeedlePatches : BaseModuleWeaver
 	{

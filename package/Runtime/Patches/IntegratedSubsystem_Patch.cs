@@ -6,7 +6,7 @@ using UnityEngine.XR;
 
 #pragma warning disable 108,114
 
-namespace needle.Weavers.InputDevicesPatch
+namespace needle.weaver.webxr
 {
 	// TODO: figure out why patching base types does not work yet
 	

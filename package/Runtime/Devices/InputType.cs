@@ -1,4 +1,4 @@
-namespace needle.Weavers.InputDevicesPatch
+namespace needle.weaver.webxr
 {
 	public enum InputType
 	{

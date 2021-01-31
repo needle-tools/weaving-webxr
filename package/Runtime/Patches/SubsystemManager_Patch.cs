@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using needle.Weaver;
 using UnityEngine;
 
-namespace needle.Weavers.InputDevicesPatch
+namespace needle.weaver.webxr
 {
 	[NeedlePatch(typeof(SubsystemManager))]
 	public class SubsystemManager_Patch

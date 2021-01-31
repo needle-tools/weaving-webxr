@@ -7,7 +7,7 @@ using Random = UnityEngine.Random;
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Local
 
-namespace needle.Weavers.InputDevicesPatch
+namespace needle.weaver.webxr
 {
 	[NeedlePatch(typeof(InputTracking))]
 	public class InputTracking_Patch

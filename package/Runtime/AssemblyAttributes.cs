@@ -3,6 +3,6 @@ using UnityEngine.Scripting;
 
 [assembly: Preserve]
 [assembly: InternalsVisibleTo("UnityEngine.XRModule")]
-[assembly: InternalsVisibleTo("needle.patch.webgl.editor")]
+[assembly: InternalsVisibleTo("needle.weaver.webxr.editor")]
 
 

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.XR;
 
-namespace needle.Weavers.InputDevicesPatch
+namespace needle.weaver.webxr
 {
 	public class MockDeviceBuilder
 	{

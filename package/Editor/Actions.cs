@@ -6,7 +6,7 @@ using needle.Weaver;
 using UnityEditor;
 using UnityEngine;
 
-namespace Fody.Weavers.InputDeviceWeaver
+namespace needle.weaver.webxr
 {
 	public static class Actions
 	{

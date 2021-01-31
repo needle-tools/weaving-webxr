@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Reflection;
-using needle.Weavers.InputDevicesPatch;
+using needle.weaver.webxr;
 using UnityEngine;
 
-namespace Patch.InputDevices.Runtime
+namespace needle.weaver.webxr
 {
 	public static class AddSubsystem
 	{

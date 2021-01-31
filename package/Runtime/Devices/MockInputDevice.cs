@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.XR;
 using Debug = UnityEngine.Debug;
 
-namespace needle.Weavers.InputDevicesPatch
+namespace needle.weaver.webxr
 {
 	public class XRNodeUsage
 	{

@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Fody;
 using needle.Weaver;
 using UnityEngine;
 
-namespace Fody.Weavers.InputDeviceWeaver
+namespace needle.weaver.webxr
 {
 	public class WeaveExternalMethods : BaseModuleWeaver
 	{

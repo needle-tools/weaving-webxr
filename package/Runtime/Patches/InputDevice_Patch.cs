@@ -1,7 +1,7 @@
 using needle.Weaver;
 using UnityEngine.XR;
 
-namespace needle.Weavers.InputDevicesPatch
+namespace needle.weaver.webxr
 {
 	[NeedlePatch(typeof(InputDevice))]
 	public class InputDevice_Patch

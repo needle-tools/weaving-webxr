@@ -9,7 +9,7 @@ using UnityEngine.XR;
 // disable hide member warning
 #pragma warning disable 108,114
 
-namespace needle.Weavers.InputDevicesPatch
+namespace needle.weaver.webxr
 {
 	[NeedlePatch(typeof(XRInputSubsystem))]
 	internal class XRInputSubsystem_Patch : XRInputSubsystem

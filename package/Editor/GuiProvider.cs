@@ -1,11 +1,11 @@
-using Fody.Weavers.InputDeviceWeaver;
+using needle.weaver.webxr;
 using Mono.Cecil;
 using needle.Weaver;
 using UnityEditor;
 using UnityEngine;
-using Actions = Fody.Weavers.InputDeviceWeaver.Actions;
+using Actions = needle.weaver.webxr.Actions;
 
-namespace Patch.InputDevices.Editor
+namespace needle.weaver.webxr
 {
 	internal class WebGlPatchGui : IPatchGUIProvider
 	{
