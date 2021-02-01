@@ -8,6 +8,7 @@ namespace needle.weaver.webxr
 	{
 		private readonly List<XRNodeState> nodeStates = new List<XRNodeState>();
 		private FieldInfo inputDeviceIdField;
+		private readonly List<InputFeatureUsage> usages = new List<InputFeatureUsage>();
 		
 		public override string GetInfo()
 		{
@@ -23,6 +24,15 @@ namespace needle.weaver.webxr
 			foreach (var dev in list)
 			{
 				str += "\n" + dev.name + ", id=" + inputDeviceIdField?.GetValue(dev);
+
+				usages.Clear();
+				if (dev.TryGetFeatureUsages(usages))
+				{
+					foreach (var usage in usages)
+					{
+						str += ", " + usage.name;
+					}
+				}
 			}
 			var headDevice = InputDevices.GetDeviceAtXRNode(XRNode.Head);
 			str += "\nHead: " + headDevice.isValid + ", name: " + headDevice.name + ", serial: " + headDevice.serialNumber + ", manufacturer: " +

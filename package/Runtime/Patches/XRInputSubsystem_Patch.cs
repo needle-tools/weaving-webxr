@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using needle.Weaver;
 using UnityEngine;
@@ -11,47 +13,59 @@ using UnityEngine.XR;
 
 namespace needle.weaver.webxr
 {
+	
 	[NeedlePatch(typeof(UnityEngine.XR.XRInputSubsystem))]
 	internal class XRInputSubsystem_Patch : UnityEngine.XR.XRInputSubsystem
 	{
-		private static readonly Lazy<XRInputSubsystem_Patch> _instance = new Lazy<XRInputSubsystem_Patch>(() => new XRInputSubsystem_Patch());
+		private static GCHandle _descriptorIdPtr;
+		private static GCHandle _subsystemInstanceHandle;
+
+		internal const string DescriptorId = "com.needle.webxr.input";
+		internal static bool IsDescriptorId(IntPtr ptr) => _descriptorIdPtr.IsAllocated && _descriptorIdPtr.AddrOfPinnedObject() == ptr;
+		
+		private static readonly Lazy<XRInputSubsystem_Patch> _instance = new Lazy<XRInputSubsystem_Patch>(() =>
+		{
+			var subsystem = new XRInputSubsystem_Patch();
+			var descriptor = new XRInputSubsystemDescriptor();
+
+			var idPtr = typeof(IntegratedSubsystemDescriptor).GetField("m_Ptr", (BindingFlags) ~0);
+			if (idPtr != null)
+			{
+				_descriptorIdPtr = GCHandle.Alloc(DescriptorId, GCHandleType.Pinned);
+				var ptr = _descriptorIdPtr.AddrOfPinnedObject();
+				Debug.Log("ID POINTER " + ptr);
+				idPtr.SetValue(descriptor, ptr);
+			}
+			
+			var ptrField = typeof(IntegratedSubsystem).GetField("m_Ptr", (BindingFlags) ~0);
+			if (ptrField != null)
+			{
+				_subsystemInstanceHandle = GCHandle.Alloc(subsystem);
+				var ptr = GCHandle.ToIntPtr(_subsystemInstanceHandle);
+				ptrField.SetValue(subsystem, ptr);
+			}
+			else Debug.LogWarning("Could not set instance pointer");
+			
+			var descriptorField = typeof(IntegratedSubsystem).GetField("m_SubsystemDescriptor", (BindingFlags) ~0);
+			if (descriptorField != null)
+			{
+				descriptorField.SetValue(subsystem, descriptor);
+			}
+			else Debug.LogWarning("Could not set descriptor");
+			
+			return subsystem;
+		});
+		
 		public static XRInputSubsystem_Patch Instance => _instance.Value;
 
 		internal static TrackingOriginModeFlags SupportedTrackingOriginMode = TrackingOriginModeFlags.Floor;
-
 		internal static readonly List<MockInputDevice> InputDevices = new List<MockInputDevice>();
 		internal static MockInputDevice TryGetDevice(ulong id) => InputDevices.FirstOrDefault(d => d.Id == id);
 
 
 		private uint Index { get; set; }
 		internal uint GetIndex() => Index;
-
-		private ISubsystemDescriptor m_SubsystemDescriptor;
 		
-		
-		internal bool valid => true;
-
-		internal bool IsRunning() => isRunning;
-
-		private bool isRunning;
-
-		public void Start()
-		{
-			Debug.Log("Starting " + this);
-			isRunning = true;
-			m_SubsystemDescriptor = new XRInputSubsystemDescriptor();
-		}
-
-		public void Stop()
-		{
-			isRunning = false;
-			Debug.Log("Stopping");
-		}
-		
-		public void Destroy()
-		{
-			
-		}
 		
 		// this is used to build the "InputDevice" list, called from InputDevices
 		internal void TryGetDeviceIds_AsList(List<ulong> deviceIds)

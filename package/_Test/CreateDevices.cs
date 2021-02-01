@@ -22,6 +22,7 @@ namespace needle.weaver.webxr
 				() => true,
 				() => Vector3.LerpUnclamped(Vector3.zero, Vector3.down * .2f, Mathf.Sin(Time.time * 2f)),
 				() => Quaternion.Euler(20, 20, 20));
+			rightController.AddFeature(CommonUsages.trigger, () => Random.value);
 			SubsystemAPI.RegisterInputDevice(rightController);
 			
 			var leftController = MockDeviceBuilder.CreateLeftController(

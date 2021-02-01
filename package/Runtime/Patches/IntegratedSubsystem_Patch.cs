@@ -11,31 +11,29 @@ namespace needle.weaver.webxr
 	// TODO: figure out why patching base types does not work yet
 	
 	[NeedlePatch(typeof(IntegratedSubsystem))]
-	internal class IntegratedSubsystem_Patch : IntegratedSubsystem
+	internal class IntegratedSubsystem_Patch
 	{
-		// private bool isRunning;
-		// internal ISubsystemDescriptor m_SubsystemDescriptor;
-		//
-		// public void Start()
-		// {
-		// 	Debug.Log("Starting " + this);
-		// 	isRunning = true;
-		// 	m_SubsystemDescriptor = new XRInputSubsystemDescriptor();
-		// }
-		//
-		// public void Stop()
-		// {
-		// 	isRunning = false;
-		// }
-		//
-		// public void Destroy()
-		// {
-		// 	isRunning = false;
-		// }
-		//
-		//
-		// internal bool valid => true;
-		//
-		// internal bool IsRunning() => isRunning;
+		private bool isRunning;
+		
+		public void Start()
+		{
+			Debug.Log("Starting 1 " + this);
+			isRunning = true;
+		}
+		
+		public void Stop()
+		{
+			isRunning = false;
+		}
+		
+		public void Destroy()
+		{
+			isRunning = false;
+		}
+		
+		
+		internal bool valid => true;
+		
+		internal bool IsRunning() => isRunning;
 	}
 }

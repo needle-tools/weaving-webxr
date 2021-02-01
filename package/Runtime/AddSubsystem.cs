@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
+using needle.Weaver;
 using needle.weaver.webxr;
 using UnityEngine;
+using UnityEngine.SubsystemsImplementation;
 
 namespace needle.weaver.webxr
 {

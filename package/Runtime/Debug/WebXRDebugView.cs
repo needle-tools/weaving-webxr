@@ -36,9 +36,9 @@ namespace needle.weaver.webxr
 
 			for (var i = 0; i < views.Length; i++)
 			{
+				var text = texts[i];
 				try
 				{
-					var text = texts[i];
 					var vw = views[i];
 					text.enabled = vw.enabled;
 					text.text = views[i].GetInfo();
@@ -47,6 +47,7 @@ namespace needle.weaver.webxr
 				catch (Exception e)
 				{
 					Debug.LogException(e);
+					text.enabled = false;
 				}
 			}
 			
