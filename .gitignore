@@ -1,0 +1,6 @@
+﻿projects/**/builds
+projects/**/Library
+projects/**/obj
+projects/**/Temp
+projects/**/Logs
+projects/**/.idea
