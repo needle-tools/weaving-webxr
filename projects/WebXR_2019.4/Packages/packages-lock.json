@@ -1,13 +1,13 @@
 {
   "dependencies": {
     "com.needle.weaver": {
-      "version": "file:../../../package",
+      "version": "file:../../../../../package",
       "depth": 0,
       "source": "local",
       "dependencies": {}
     },
     "com.needle.weaver.webxr": {
-      "version": "file:../../../modules/weaving-webxr/package",
+      "version": "file:../../../package/",
       "depth": 0,
       "source": "local",
       "dependencies": {
