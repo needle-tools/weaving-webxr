@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -16,8 +17,13 @@ namespace needle.weaver.webxr
 				return;
 			}
 #endif
+			#if UNITY_2020_2_OR_NEWER
 			var type = typeof(SubsystemManager);
+			#else
+			var type = Type.GetType("UnityEngine.Internal_SubsystemInstances");
+			#endif
 			var field = type.GetField("s_IntegratedSubsystems", (BindingFlags) ~0);
+			if (field == null) Debug.LogError("Could not get integrated subsystems list");
 			var list = field?.GetValue(null) as List<IntegratedSubsystem>;
 			var my = XRInputSubsystem_Patch.Instance;
 			list?.Add(my);

@@ -20,7 +20,7 @@ namespace needle.weaver.webxr
 			Debug.Log("Registered input device " + dev.Id + " - " + dev.Node);
 		}
 
-		public static void RemoveDevice(MockInputDevice dev)
+		public static void UnRegisterInputDevice(MockInputDevice dev)
 		{
 			if (dev == null) return;
 			if (!XRInputSubsystem_Patch.InputDevices.Contains(dev)) return;

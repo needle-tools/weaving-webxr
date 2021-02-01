@@ -23,7 +23,11 @@ namespace needle.weaver.webxr
 
 				if (getBindingMethod == null)
 				{
+#if UNITY_2020_2_OR_NEWER
 					var type = Type.GetType("UnityEngine.SubsystemDescriptorBindings");
+#else
+					var type = Type.GetType("UnityEngine.Internal_SubsystemDescriptors");
+#endif
 					if (type != null)
 					{
 						getBindingMethod = type.GetMethod("GetId", (BindingFlags) ~0, null, CallingConventions.Any, new Type[] {typeof(IntPtr)}, null);
