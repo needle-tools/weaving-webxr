@@ -11,6 +11,6 @@ namespace needle.weaver.webxr
 	
 	public interface IButtonActionProvider
 	{
-		public void GetActions(List<ButtonAction> list);
+		void GetActions(List<ButtonAction> list);
 	}
 }

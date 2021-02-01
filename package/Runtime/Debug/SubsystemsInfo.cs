@@ -11,7 +11,8 @@ namespace needle.weaver.webxr
 		
 		public override string GetInfo()
 		{
-			SubsystemManager.GetSubsystems(subs);
+			SubsystemManager.GetInstances(subs);
+			// SubsystemManager.GetSubsystems(subs);
 			var str = subs.Count + " XRInputSubsystems";
 			foreach (var sub in subs)
 			{

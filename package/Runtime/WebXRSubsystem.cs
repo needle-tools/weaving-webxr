@@ -1,5 +1,4 @@
-﻿using UnityEngine.SubsystemsImplementation;
-using UnityEngine.XR;
+﻿using UnityEngine.XR;
 
 namespace needle.weaver.webxr
 {

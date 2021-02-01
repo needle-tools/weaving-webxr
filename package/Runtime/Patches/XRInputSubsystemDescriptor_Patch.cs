@@ -1,7 +1,3 @@
-using System;
-using needle.Weaver;
-using UnityEngine.SubsystemsImplementation;
-using UnityEngine.XR;
 
 namespace needle.weaver.webxr
 {
