@@ -24,7 +24,7 @@ namespace needle.weaver.webxr
 
 	public class MockInputDevice
 	{
-		public ulong Id { get; private set; }
+		public ulong Id { get; }
 		public string Name { get; private set; }
 		public string Manufacturer { get; set; }
 		public string SerialNumber { get; set; }
@@ -33,7 +33,7 @@ namespace needle.weaver.webxr
 		public XRNode Node { get; }
 		public InputDeviceCharacteristics DeviceCharacteristics { get; set; }
 
-		private static ulong _idCounter;
+		private static ulong _idCounter = 0;
 
 		public MockInputDevice(string name, XRNode node)
 		{

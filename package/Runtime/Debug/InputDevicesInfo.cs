@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 using UnityEngine.XR;
 
 namespace needle.weaver.webxr
@@ -24,15 +25,32 @@ namespace needle.weaver.webxr
 			foreach (var dev in list)
 			{
 				str += "\n" + dev.name + ", id=" + inputDeviceIdField?.GetValue(dev);
-
 				usages.Clear();
 				if (dev.TryGetFeatureUsages(usages))
 				{
+					str += usages.Count + " usages:";
 					foreach (var usage in usages)
 					{
-						str += ", " + usage.name;
+						str += "\n";
+						str += usage.name;
+						if (usage.type == typeof(Vector3))
+						{
+							if (dev.TryGetFeatureValue(usage.As<Vector3>(), out var val))
+								str += ": " + val.ToString("0.00");
+						}
+						else if(usage.type == typeof(bool))
+						{
+							if (dev.TryGetFeatureValue(usage.As<bool>(), out var val))
+								str += ": " + val;
+						}
+						else if(usage.type == typeof(float))
+						{
+							if (dev.TryGetFeatureValue(usage.As<float>(), out var val))
+								str += ": " + val.ToString("0.00");
+						}
 					}
 				}
+				str += "\n----";
 			}
 			var headDevice = InputDevices.GetDeviceAtXRNode(XRNode.Head);
 			str += "\nHead: " + headDevice.isValid + ", name: " + headDevice.name + ", serial: " + headDevice.serialNumber + ", manufacturer: " +

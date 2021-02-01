@@ -7,8 +7,7 @@ namespace needle.weaver.webxr
 	{
 		private static Quaternion _rotation = Quaternion.identity;
 
-		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
-		private static void Init()
+		private void Awake()
 		{
 			if (Application.isEditor) return;
 			
@@ -23,6 +22,12 @@ namespace needle.weaver.webxr
 				() => Vector3.LerpUnclamped(Vector3.zero, Vector3.down * .2f, Mathf.Sin(Time.time * 2f)),
 				() => Quaternion.Euler(20, 20, 20));
 			rightController.AddFeature(CommonUsages.trigger, () => Random.value);
+			rightController.AddFeature(CommonUsages.triggerButton, () => Random.value > .5f);
+			rightController.AddFeature(CommonUsages.primary2DAxis, () => Random.insideUnitCircle);
+			rightController.AddFeature(CommonUsages.primaryButton, () => Random.value > .5);
+			rightController.AddFeature(CommonUsages.secondaryButton, () => Random.value > .5);
+			rightController.AddFeature(CommonUsages.grip, () => Random.value);
+			rightController.AddFeature(CommonUsages.gripButton, () => Random.value > .5f);
 			SubsystemAPI.RegisterInputDevice(rightController);
 			
 			var leftController = MockDeviceBuilder.CreateLeftController(
