@@ -1,8 +1,5 @@
-using System;
 using needle.Weaver;
 using UnityEngine;
-using UnityEngine.Subsystems;
-using UnityEngine.XR;
 
 #pragma warning disable 108,114
 
@@ -17,7 +14,7 @@ namespace needle.weaver.webxr
 		
 		public void Start()
 		{
-			Debug.Log("Starting 1 " + this);
+			// Debug.Log("Starting 1 " + this);
 			isRunning = true;
 		}
 		
