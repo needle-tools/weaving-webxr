@@ -5,3 +5,4 @@ projects/**/Temp
 projects/**/Logs
 projects/**/.idea
 projects/**/*.csproj
+projects/**/*.sln
