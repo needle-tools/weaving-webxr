@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -13,6 +12,7 @@ namespace needle.weaver.webxr
 	{
 		private static readonly List<InputDevice> _buffer = new List<InputDevice>();
 		private static IList<MockInputDevice> _inputDevices => XRInputSubsystem_Patch.InputDevices;
+		private static bool running => XRInputSubsystem_Patch.Instance.running;
 
 		public enum ConnectionChangeType : uint
 		{
@@ -30,18 +30,22 @@ namespace needle.weaver.webxr
 
 		private static InputDevice GetDeviceAtXRNode(XRNode node)
 		{
-			if (_buffer.Count != _inputDevices.Count) XRInputSubsystem_Patch.Instance.TryGetInputDevices(_buffer);
-
-			for (var index = 0; index < _inputDevices.Count && index < _buffer.Count; index++)
+			if (running)
 			{
-				var dev = _inputDevices[index];
-				if (dev.Node == node)
-				{
-					return _buffer[index];
-				}
-			}
+				if (_buffer.Count != _inputDevices.Count) XRInputSubsystem_Patch.Instance.TryGetInputDevices(_buffer);
 
-			Debug.LogWarning("Could not find device at " + node);
+				for (var index = 0; index < _inputDevices.Count && index < _buffer.Count; index++)
+				{
+					var dev = _inputDevices[index];
+					if (dev.Node == node)
+					{
+						return _buffer[index];
+					}
+				}
+
+				Debug.LogWarning("Could not find device at " + node);
+			}
+			
 			return new InputDevice();
 		}
 
@@ -67,6 +71,7 @@ namespace needle.weaver.webxr
 
 		internal static bool TryGetFeatureUsages(ulong deviceId, List<InputFeatureUsage> featureUsages)
 		{
+			if (!running) return false;
 			var device = XRInputSubsystem_Patch.TryGetDevice(deviceId);
 			return device != null && device.TryGetUsages(featureUsages);
 		}
@@ -76,8 +81,9 @@ namespace needle.weaver.webxr
 			string usage,
 			out bool value)
 		{
-			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			value = default;
+			if (!running) return false;
+			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			return dev != null && dev.TryGetUsage(usage, out value);
 		}
 
@@ -86,8 +92,9 @@ namespace needle.weaver.webxr
 			string usage,
 			out uint value)
 		{
-			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			value = default;
+			if (!running) return false;
+			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			return dev != null && dev.TryGetUsage(usage, out value);
 		}
 
@@ -96,8 +103,9 @@ namespace needle.weaver.webxr
 			string usage,
 			out float value)
 		{
-			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			value = default;
+			if (!running) return false;
+			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			return dev != null && dev.TryGetUsage(usage, out value);
 		}
 
@@ -106,8 +114,9 @@ namespace needle.weaver.webxr
 			string usage,
 			out Vector2 value)
 		{
-			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			value = default;
+			if (!running) return false;
+			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			return dev != null && dev.TryGetUsage(usage, out value);
 		}
 
@@ -116,8 +125,9 @@ namespace needle.weaver.webxr
 			string usage,
 			out Vector3 value)
 		{
-			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			value = default;
+			if (!running) return false;
+			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			return dev != null && dev.TryGetUsage(usage, out value);
 		}
 
@@ -127,8 +137,9 @@ namespace needle.weaver.webxr
 			string usage,
 			out Quaternion value)
 		{
-			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			value = default;
+			if (!running) return false;
+			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			return dev != null && dev.TryGetUsage(usage, out value);
 		}
 
@@ -138,8 +149,9 @@ namespace needle.weaver.webxr
 			string usage,
 			out byte[] value)
 		{
-			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			value = default;
+			if (!running) return false;
+			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			return dev != null && dev.TryGetUsage(usage, out value);
 		}
 
@@ -150,8 +162,9 @@ namespace needle.weaver.webxr
 			long time,
 			out bool value)
 		{
-			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			value = default;
+			if (!running) return false;
+			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			return dev != null && dev.TryGetUsage(usage, out value);
 		}
 
@@ -162,8 +175,9 @@ namespace needle.weaver.webxr
 			long time,
 			out uint value)
 		{
-			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			value = default;
+			if (!running) return false;
+			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			return dev != null && dev.TryGetUsage(usage, out value);
 		}
 
@@ -174,8 +188,9 @@ namespace needle.weaver.webxr
 			long time,
 			out float value)
 		{
-			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			value = default;
+			if (!running) return false;
+			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			return dev != null && dev.TryGetUsage(usage, out value);
 		}
 
@@ -186,8 +201,9 @@ namespace needle.weaver.webxr
 			long time,
 			out Vector2 value)
 		{
-			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			value = default;
+			if (!running) return false;
+			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			return dev != null && dev.TryGetUsage(usage, out value);
 		}
 
@@ -198,8 +214,9 @@ namespace needle.weaver.webxr
 			long time,
 			out Vector3 value)
 		{
-			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			value = default;
+			if (!running) return false;
+			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			return dev != null && dev.TryGetUsage(usage, out value);
 		}
 
@@ -210,8 +227,9 @@ namespace needle.weaver.webxr
 			long time,
 			out Quaternion value)
 		{
-			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			value = default;
+			if (!running) return false;
+			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			return dev != null && dev.TryGetUsage(usage, out value);
 		}
 
@@ -221,8 +239,9 @@ namespace needle.weaver.webxr
 			string usage,
 			out Hand value)
 		{
-			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			value = default;
+			if (!running) return false;
+			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			return dev != null && dev.TryGetUsage(usage, out value);
 		}
 
@@ -232,8 +251,9 @@ namespace needle.weaver.webxr
 			string usage,
 			out Bone value)
 		{
-			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			value = default;
+			if (!running) return false;
+			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			return dev != null && dev.TryGetUsage(usage, out value);
 		}
 
@@ -243,8 +263,9 @@ namespace needle.weaver.webxr
 			string usage,
 			out Eyes value)
 		{
-			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			value = default;
+			if (!running) return false;
+			var dev = _inputDevices.FirstOrDefault(d => d.Id == deviceId);
 			return dev != null && dev.TryGetUsage(usage, out value);
 		}
 	}

@@ -2,18 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using needle.Weaver;
 using UnityEngine;
 using UnityEngine.XR;
+using Random = UnityEngine.Random;
 
 // disable hide member warning
 #pragma warning disable 108,114
 
 namespace needle.weaver.webxr
 {
-	
 	[NeedlePatch(typeof(UnityEngine.XR.XRInputSubsystem))]
 	internal class XRInputSubsystem_Patch : UnityEngine.XR.XRInputSubsystem
 	{
@@ -57,19 +58,39 @@ namespace needle.weaver.webxr
 		});
 		
 		public static XRInputSubsystem_Patch Instance => _instance.Value;
-
-		internal static TrackingOriginModeFlags SupportedTrackingOriginMode = TrackingOriginModeFlags.Floor;
 		internal static readonly List<MockInputDevice> InputDevices = new List<MockInputDevice>();
 		internal static MockInputDevice TryGetDevice(ulong id) => InputDevices.FirstOrDefault(d => d.Id == id);
+		internal static TrackingOriginModeFlags SupportedTrackingOriginMode = TrackingOriginModeFlags.Floor | TrackingOriginModeFlags.Device;
+		private static TrackingOriginModeFlags currentTrackingMode = TrackingOriginModeFlags.Device;
 
+		internal void OnStart()
+		{
+			Debug.Log("OnStart");
+		}
 
-		private uint Index { get; set; }
+		internal void OnStop()
+		{
+			
+		}
+
+		internal void OnDestroy()
+		{
+			
+		}
+		
+		
+		// ----------------------- patched methods:
+		
+		
+		private static uint Index => 0;
 		internal uint GetIndex() => Index;
 		
 		
 		// this is used to build the "InputDevice" list, called from InputDevices
 		internal void TryGetDeviceIds_AsList(List<ulong> deviceIds)
 		{
+			deviceIds.Clear();
+			if (!running) return;
 			// it is very important that the order is the same
 			foreach (var dev in InputDevices) 
 				deviceIds.Add(dev.Id);
@@ -77,13 +98,12 @@ namespace needle.weaver.webxr
 
 		public bool TryRecenter()
 		{
+			if (!running) return false;
+			
 			// TODO: implement
 			return true;
 		}
 
-
-		private TrackingOriginModeFlags currentTrackingMode = TrackingOriginModeFlags.Device;
-		
 		public bool TrySetTrackingOriginMode(TrackingOriginModeFlags origin)
 		{
 			currentTrackingMode = origin;
@@ -96,6 +116,7 @@ namespace needle.weaver.webxr
 
 		private bool TryGetBoundaryPoints_AsList(List<Vector3> boundaryPoints)
 		{
+			if (!running) return false;
 			// TODO implement
 			// boundaryPoints.Clear();
 			// boundaryPoints.AddRange();
@@ -106,16 +127,16 @@ namespace needle.weaver.webxr
 		public event Action<UnityEngine.XR.XRInputSubsystem> trackingOriginUpdated;
 		public event Action<UnityEngine.XR.XRInputSubsystem> boundaryChanged;
 
-		private static void InvokeTrackingOriginUpdatedEvent(IntPtr internalPtr)
+		internal static void InvokeTrackingOriginUpdatedEvent(IntPtr internalPtr)
 		{
+			if (!Instance.running) return;
 			Instance.trackingOriginUpdated?.Invoke(Instance);
 		}
 		
-		private static void InvokeBoundaryChangedEvent(IntPtr internalPtr)
+		internal static void InvokeBoundaryChangedEvent(IntPtr internalPtr)
 		{
+			if (!Instance.running) return;
 			Instance.boundaryChanged?.Invoke(Instance);
 		}
-
-
 	}
 }

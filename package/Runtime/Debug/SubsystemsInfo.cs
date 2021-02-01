@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
 
@@ -27,6 +28,25 @@ namespace needle.weaver.webxr
 				}
 			}
 			return str;
+		}
+
+		public override void GetActions(List<ButtonAction> list)
+		{
+			base.GetActions(list);
+			list.Add(new ButtonAction()
+			{
+				Name = "Toggle WebXR Subsystem",
+				Callback = OnToggle
+			});
+		}
+
+		private static WebXRSubsystem subsystem;
+
+		private static void OnToggle()
+		{
+			if (!subsystem) subsystem = FindObjectOfType<WebXRSubsystem>();
+			if (!subsystem) return;
+			subsystem.enabled = !subsystem.enabled;
 		}
 	}
 }

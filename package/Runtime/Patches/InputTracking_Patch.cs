@@ -15,6 +15,7 @@ namespace needle.weaver.webxr
 		private static void GetNodeStates_Internal(List<XRNodeState> nodeStates)
 		{
 			nodeStates.Clear();
+			if (!XRInputSubsystem_Patch.Instance.running) return;
 			
 			var devices = XRInputSubsystem_Patch.InputDevices;
 			foreach (var device in devices)
@@ -25,6 +26,8 @@ namespace needle.weaver.webxr
 
 		private static ulong GetDeviceIdAtXRNode(XRNode node)
 		{
+			if (!XRInputSubsystem_Patch.Instance.running) return long.MaxValue;
+			
 			var devices = XRInputSubsystem_Patch.InputDevices;
 			foreach (var device in devices)
 			{
@@ -39,6 +42,7 @@ namespace needle.weaver.webxr
 		internal static void GetDeviceIdsAtXRNode_Internal(XRNode node, List<ulong> deviceIds)
 		{
 			deviceIds.Clear();
+			if (!XRInputSubsystem_Patch.Instance.running) return;
 			
 			var devices = XRInputSubsystem_Patch.InputDevices;
 			foreach (var device in devices)
@@ -57,6 +61,8 @@ namespace needle.weaver.webxr
 
 		public static string GetNodeName(ulong uniqueId)
 		{
+			if (!XRInputSubsystem_Patch.Instance.running) return null;
+			
 			var devices = XRInputSubsystem_Patch.InputDevices;
 			foreach (var device in devices)
 			{

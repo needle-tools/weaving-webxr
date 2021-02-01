@@ -14,7 +14,7 @@ namespace needle.weaver.webxr
 			SubsystemAPI.RegisterInputDevice(MockDeviceBuilder.CreateHeadset(
 					() => true,
 					() => Vector3.LerpUnclamped(new Vector3(0,0,-.5f), Vector3.up * .2f, Mathf.Sin(Time.time)),
-					() => _rotation
+					() => Quaternion.identity
 				)
 			);
 			var rightController = MockDeviceBuilder.CreateRightController(
@@ -39,7 +39,6 @@ namespace needle.weaver.webxr
 			// leftController.DebugLog = rightController.DebugLog = true;
 
 			SubsystemAPI.SetSupportedTrackingMode(TrackingOriginModeFlags.Device | TrackingOriginModeFlags.Floor);
-			SubsystemAPI.Instance.Start();
 		}
 
 		private void Update()

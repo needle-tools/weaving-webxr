@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace needle.weaver.webxr
 {
 	public class WebXRDebugView : MonoBehaviour
 	{
-		public GameObject Template;
 		public Transform Content;
+		[FormerlySerializedAs("Template")] public GameObject TextTemplate;
+		public GameObject ButtonTemplate;
 
 		private DebugInfo[] views;
 		private List<Text> texts;
@@ -19,14 +21,27 @@ namespace needle.weaver.webxr
 			{
 				views = GetComponentsInChildren<DebugInfo>();
 				texts = new List<Text>();
-				Template.SetActive(true);
-				foreach (var unused in views)
+				TextTemplate.SetActive(true);
+				ButtonTemplate.SetActive(true);
+				var actions = new List<ButtonAction>();
+				foreach (var info in views)
 				{
-					var instance = Instantiate(Template, Content);
+					var instance = Instantiate(TextTemplate, Content);
 					var textInstance = instance.GetComponentInChildren<Text>();
 					texts.Add(textInstance);
+					
+					actions.Clear();
+					info.GetActions(actions);
+					foreach (var act in actions)
+					{
+						var buttonInstance = Instantiate(ButtonTemplate, Content);
+						buttonInstance.GetComponentInChildren<Text>().text = act.Name;
+						buttonInstance.GetComponentInChildren<Button>().onClick.AddListener(() => act.Callback());
+						LayoutRebuilder.MarkLayoutForRebuild(buttonInstance.transform as RectTransform);
+					}
 				}
-				Template.SetActive(false);
+				TextTemplate.SetActive(false);
+				ButtonTemplate.SetActive(false);
 			}
 
 			if (views.Length <= 0)

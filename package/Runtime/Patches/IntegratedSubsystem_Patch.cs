@@ -14,18 +14,30 @@ namespace needle.weaver.webxr
 		
 		public void Start()
 		{
-			// Debug.Log("Starting 1 " + this);
 			isRunning = true;
+			// Debug.Log(this);
+			if (this.GetType() == typeof(XRInputSubsystem_Patch))
+			{
+				XRInputSubsystem_Patch.Instance.OnStart();
+			}
 		}
 		
 		public void Stop()
 		{
 			isRunning = false;
+			if (this.GetType() == typeof(XRInputSubsystem_Patch))
+			{
+				XRInputSubsystem_Patch.Instance.OnStop();
+			}
 		}
 		
 		public void Destroy()
 		{
 			isRunning = false;
+			if (this.GetType() == typeof(XRInputSubsystem_Patch))
+			{
+				XRInputSubsystem_Patch.Instance.OnDestroy();
+			}
 		}
 		
 		
