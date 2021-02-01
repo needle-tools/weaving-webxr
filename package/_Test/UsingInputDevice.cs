@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using needle.weaver.webxr;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR;
@@ -13,13 +12,12 @@ namespace needle.weaver.webxr
 	{
 		public Text Text;
 
-		private static MockInputDevice device;
 		private static Quaternion _rotation = Quaternion.identity;
 
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
 		private static void Init()
 		{
-			XRInputSubsystem_Patch.RegisterInputDevice(MockDeviceBuilder.CreateHeadset(
+			SubsystemAPI.RegisterInputDevice(MockDeviceBuilder.CreateHeadset(
 					() => true,
 					() => Vector3.LerpUnclamped(new Vector3(0,0,-.5f), Vector3.up * .2f, Mathf.Sin(Time.time)),
 					() => _rotation
@@ -29,18 +27,18 @@ namespace needle.weaver.webxr
 				() => true,
 				() => Vector3.LerpUnclamped(Vector3.zero, Vector3.down * .2f, Mathf.Sin(Time.time * 2f)),
 				() => Quaternion.Euler(20, 20, 20));
-			XRInputSubsystem_Patch.RegisterInputDevice(rightController);
+			SubsystemAPI.RegisterInputDevice(rightController);
 			
 			var leftController = MockDeviceBuilder.CreateLeftController(
 				() => true,
 				() => Vector3.LerpUnclamped(Vector3.zero, Vector3.right * .5f, Mathf.Sin(Time.time * 5f)),
 				() => Quaternion.identity);
-			XRInputSubsystem_Patch.RegisterInputDevice(leftController);
+			SubsystemAPI.RegisterInputDevice(leftController);
 
 			// leftController.DebugLog = rightController.DebugLog = true;
-			
-			XRInputSubsystem_Patch.SupportedTrackingOriginMode = TrackingOriginModeFlags.Device | TrackingOriginModeFlags.Floor;
-			XRInputSubsystem_Patch.Instance.Start();
+
+			SubsystemAPI.SetSupportedTrackingMode(TrackingOriginModeFlags.Device | TrackingOriginModeFlags.Floor);
+			SubsystemAPI.Instance.Start();
 		}
 
 		private void Update()

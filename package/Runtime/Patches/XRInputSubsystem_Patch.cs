@@ -11,36 +11,22 @@ using UnityEngine.XR;
 
 namespace needle.weaver.webxr
 {
-	[NeedlePatch(typeof(XRInputSubsystem))]
-	internal class XRInputSubsystem_Patch : XRInputSubsystem
+	[NeedlePatch(typeof(UnityEngine.XR.XRInputSubsystem))]
+	internal class XRInputSubsystem_Patch : UnityEngine.XR.XRInputSubsystem
 	{
 		private static readonly Lazy<XRInputSubsystem_Patch> _instance = new Lazy<XRInputSubsystem_Patch>(() => new XRInputSubsystem_Patch());
 		public static XRInputSubsystem_Patch Instance => _instance.Value;
 
-		public static TrackingOriginModeFlags SupportedTrackingOriginMode = TrackingOriginModeFlags.Floor;
-		public static TrackingOriginModeFlags CurrentTrackingMode = TrackingOriginModeFlags.Device;
+		internal static TrackingOriginModeFlags SupportedTrackingOriginMode = TrackingOriginModeFlags.Floor;
 
-		public uint Index { get; set; }
-
-		public static void RegisterInputDevice(MockInputDevice dev)
-		{
-			if (dev == null) return;
-			if (!InputDevices.Contains(dev))
-			{
-				InputDevices.Add(dev);
-				Debug.Log("Registered input device " + dev.Id + " - " + dev.Node);
-			}
-		}
-		
 		internal static readonly List<MockInputDevice> InputDevices = new List<MockInputDevice>();
+		internal static MockInputDevice TryGetDevice(ulong id) => InputDevices.FirstOrDefault(d => d.Id == id);
 
-		public static MockInputDevice TryGetDevice(ulong id) => InputDevices.FirstOrDefault(d => d.Id == id);
 
-
-		
+		private uint Index { get; set; }
 		internal uint GetIndex() => Index;
 
-		internal ISubsystemDescriptor m_SubsystemDescriptor;
+		private ISubsystemDescriptor m_SubsystemDescriptor;
 		
 		
 		internal bool valid => true;
@@ -77,30 +63,34 @@ namespace needle.weaver.webxr
 
 		public bool TryRecenter()
 		{
+			// TODO: implement
 			return true;
 		}
 
 
+		private TrackingOriginModeFlags currentTrackingMode = TrackingOriginModeFlags.Device;
+		
 		public bool TrySetTrackingOriginMode(TrackingOriginModeFlags origin)
 		{
-			CurrentTrackingMode = origin;
+			currentTrackingMode = origin;
 			return true;
 		}
 
-		public TrackingOriginModeFlags GetTrackingOriginMode() => CurrentTrackingMode;
+		public TrackingOriginModeFlags GetTrackingOriginMode() => currentTrackingMode;
 
 		public TrackingOriginModeFlags GetSupportedTrackingOriginModes() => SupportedTrackingOriginMode;
 
 		private bool TryGetBoundaryPoints_AsList(List<Vector3> boundaryPoints)
 		{
-			boundaryPoints.Clear();
-			boundaryPoints.AddRange(boundaryPoints);
+			// TODO implement
+			// boundaryPoints.Clear();
+			// boundaryPoints.AddRange();
 			return true;
 		}
 
 
-		public event Action<XRInputSubsystem> trackingOriginUpdated;
-		public event Action<XRInputSubsystem> boundaryChanged;
+		public event Action<UnityEngine.XR.XRInputSubsystem> trackingOriginUpdated;
+		public event Action<UnityEngine.XR.XRInputSubsystem> boundaryChanged;
 
 		private static void InvokeTrackingOriginUpdatedEvent(IntPtr internalPtr)
 		{
