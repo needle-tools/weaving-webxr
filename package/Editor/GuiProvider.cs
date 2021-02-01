@@ -16,7 +16,7 @@ namespace needle.weaver.webxr
 		{
 			EditorGUILayout.BeginHorizontal();
 			if(GUILayout.Button("Patch WebGL XR Assemblies"))
-				Actions.Weave_WebGL_Patches();
+				Actions.PatchAssemblies();
 			GUILayout.FlexibleSpace();
 			EditorGUILayout.EndHorizontal();
 		}

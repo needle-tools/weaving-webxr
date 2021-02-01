@@ -5,13 +5,15 @@ using UnityEditor.Build.Reporting;
 
 namespace needle.weaver.webxr
 {
-	internal class ApplyOnBuild : IPreprocessBuildWithReport
+	internal class BuildProcessor : IPreprocessBuildWithReport
 	{
 		public int callbackOrder => 1000;
 		public void OnPreprocessBuild(BuildReport report)
 		{
+			Actions.AddEmScriptArgs();
+			
 			if(WeaverSettings.instance.PatchOnBuild)
-				Actions.Weave_WebGL_Patches();
+				Actions.PatchAssemblies();
 		}
 	}
 }
