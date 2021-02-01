@@ -59,6 +59,9 @@ public class XRRigGiveMeInfo : MonoBehaviour
             "NO AR\n" + 
             #endif
             "count: " + subsystem.Count + "\n" + 
-            string.Join("\n", subsystem.Select(x => "running: " + x?.running + ", descriptor: " + x?.subsystemDescriptor?.id));
+            string.Join("\n", subsystem.Select(x =>
+            {
+                return "running: " + x?.running + ", descriptor: " + x?.SubsystemDescriptor?.id;
+            }));
     }
 }
