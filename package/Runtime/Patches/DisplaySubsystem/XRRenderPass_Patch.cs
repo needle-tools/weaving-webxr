@@ -34,17 +34,20 @@ namespace needle.weaver.webxr
 	public class XRMirrorViewBlitDesc_Patch
 	{
 		private static RenderTexture[] src;
+
+		public static Camera Left;
+		public static Camera Right;
 		
 		private static void GetBlitParameter_Injected(
 			ref XRDisplaySubsystem.XRMirrorViewBlitDesc _unity_self,
 			int blitParameterIndex,
 			out XRDisplaySubsystem.XRBlitParams blitParameter)
 		{
-			if (_unity_self.nativeBlitAvailable)
-			{
-				_unity_self.GetBlitParameter(0, out blitParameter);
-				return;
-			}
+			// if (_unity_self.nativeBlitAvailable)
+			// {
+			// 	_unity_self.GetBlitParameter(0, out blitParameter);
+			// 	return;
+			// }
 			
 			Debug.Log("Get blit parameter " + blitParameterIndex);
 			var bp = new XRDisplaySubsystem.XRBlitParams();
@@ -68,10 +71,14 @@ namespace needle.weaver.webxr
 					go.transform.localRotation = Quaternion.identity;
 					var cam = go.AddComponent<Camera>();
 					cam.fieldOfView = 50;
-					cam.stereoTargetEye = i == 0 ?StereoTargetEyeMask.Left : StereoTargetEyeMask.Right;
+					cam.stereoTargetEye = i == 0 ? StereoTargetEyeMask.Left : StereoTargetEyeMask.Right;
 					cam.targetTexture = src[i];
+					if (i == 0) Left = cam;
+					else Right = cam;
 				}
 			}
+			// _cam.Render();
+			// Graphics.CopyTexture(_cam.targetTexture, 0, array, blitParameterIndex);
 
 			var width = 1 / (float) src.Length;
 			bp.destRect = new Rect(blitParameterIndex * width, 0, width, 1);

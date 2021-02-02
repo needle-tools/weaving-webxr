@@ -43,7 +43,7 @@ namespace needle.weaver.webxr
 			return rt;
 		});
 
-		private readonly List<RenderTexture> rts = new List<RenderTexture>();
+		private RenderTexture target;
 
 		// ------------------------ patched methods
 
@@ -60,7 +60,6 @@ namespace needle.weaver.webxr
 
 		public new int GetRenderPassCount() => 1;
 
-		public static Texture2DArray array;
 		private bool Internal_TryGetRenderPass(
 			int renderPassIndex,
 			out XRRenderPass renderPass)
@@ -68,18 +67,17 @@ namespace needle.weaver.webxr
 			Debug.Log("Get render pass index " + renderPassIndex);
 			renderPass = new XRRenderPass();
 			
-			if(rts.Count <= 0)
+			if(!target)
 			// if (renderPassIndex >= rts.Count)
 			{
-				var rt = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.Default, 0);
-				rt.depth = 2;
-				rt.dimension = TextureDimension.Tex2DArray;
-				rt.Create();
-				rts.Add(rt);
+				target = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.Default, 0);
+				target.depth = 2;
+				target.dimension = TextureDimension.Tex2DArray;
+				target.Create();
 			}
 
-			renderPass.renderTarget = rts[0];
-			renderPass.renderTargetDesc = rts[0].descriptor;
+			renderPass.renderTarget = target;
+			renderPass.renderTargetDesc = target.descriptor;
 			renderPass.shouldFillOutDepth = true;
 			renderPass.cullingPassIndex = 0;
 			renderPass.renderPassIndex = renderPassIndex;
