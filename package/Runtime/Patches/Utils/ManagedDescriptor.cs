@@ -9,7 +9,7 @@ namespace needle.weaver.webxr.Utils
 {
 	public class ManagedDescriptor : IDisposable
 	{
-		internal readonly static List<ManagedDescriptor> Instances = new List<ManagedDescriptor>();
+		internal static readonly List<ManagedDescriptor> Instances = new List<ManagedDescriptor>();
 
 		public static bool TryGetInstance(string id, out ManagedDescriptor instance)
 		{
