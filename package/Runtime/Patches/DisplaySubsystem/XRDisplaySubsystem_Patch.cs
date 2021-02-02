@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Permissions;
 using needle.Weaver;
 using needle.weaver.webxr.Utils;
@@ -41,6 +42,8 @@ namespace needle.weaver.webxr
 			return rt;
 		});
 
+		private readonly List<RenderTexture> rts = new List<RenderTexture>();
+
 		// ------------------------ patched methods
 
 		public new bool displayOpaque => true;
@@ -50,11 +53,11 @@ namespace needle.weaver.webxr
 		public new float scaleOfAllRenderTargets => 1;
 
 
-		public new XRDisplaySubsystem.TextureLayout textureLayout { get; set; } = TextureLayout.SeparateTexture2Ds;
+		public new TextureLayout textureLayout { get; set; } = TextureLayout.SeparateTexture2Ds;
 
-		public new XRDisplaySubsystem.TextureLayout supportedTextureLayouts => TextureLayout.SeparateTexture2Ds;
+		public new TextureLayout supportedTextureLayouts => TextureLayout.SeparateTexture2Ds;
 
-		public new int GetRenderPassCount() => 1;
+		public new int GetRenderPassCount() => 2;
 
 		private bool Internal_TryGetRenderPass(
 			int renderPassIndex,
@@ -62,11 +65,18 @@ namespace needle.weaver.webxr
 		{
 			Debug.Log("Get render pass index " + renderPassIndex);
 			renderPass = new XRRenderPass();
-			renderPass.renderTarget = RenderTexture.Value;
-			renderPass.renderTargetDesc = RenderTexture.Value.descriptor;
+			if (renderPassIndex >= rts.Count)
+			{
+				var rt = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.Default, 0);
+				rt.Create();
+				rts.Add(rt);
+			}
+
+			renderPass.renderTarget = rts[renderPassIndex];
+			renderPass.renderTargetDesc = rts[renderPassIndex].descriptor;
 			renderPass.shouldFillOutDepth = true;
 			renderPass.cullingPassIndex = 0;
-			renderPass.renderPassIndex = 0;
+			renderPass.renderPassIndex = renderPassIndex;
 			return true;
 		}
 
@@ -121,8 +131,13 @@ namespace needle.weaver.webxr
 
 		public new RenderTexture GetRenderTextureForRenderPass(int renderPass)
 		{
+			if (renderPass < 0 || renderPass > rts.Count)
+			{
+				Debug.LogError("Requested RenderPass out of range: " + renderPass);
+				return null;
+			}
 			Debug.Log(nameof(GetRenderTextureForRenderPass) + ": " + renderPass);
-			return null;
+			return rts[renderPass];
 		}
 
 		public new void SetMSAALevel(int level)

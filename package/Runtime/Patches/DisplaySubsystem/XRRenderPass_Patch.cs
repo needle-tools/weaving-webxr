@@ -24,7 +24,7 @@ namespace needle.weaver.webxr
 		private static int GetRenderParameterCount_Injected(
 			ref XRDisplaySubsystem.XRRenderPass _unity_self)
 		{
-			return 2;
+			return Time.frameCount % 2 + 1;
 		}
 	}
 
@@ -38,21 +38,39 @@ namespace needle.weaver.webxr
 			int blitParameterIndex,
 			out XRDisplaySubsystem.XRBlitParams blitParameter)
 		{
+			if (_unity_self.nativeBlitAvailable)
+			{
+				_unity_self.GetBlitParameter(0, out blitParameter);
+				return;
+			}
+			
 			Debug.Log("Get blit parameter " + blitParameterIndex);
 			var bp = new XRDisplaySubsystem.XRBlitParams();
 			bp.srcRect = new Rect(0, 0, 1, 1);
 			
 			if (src == null)
 			{
-				src = new[] {new RenderTexture(1, 1, 0), new RenderTexture(1, 1, 0)};
+				src = new[]
+				{
+					new RenderTexture((int)(Screen.width * .5f), Screen.height, 0), 
+					new RenderTexture((int)(Screen.width * .5f), Screen.height, 0)
+				};
 				for (int i = 0; i < src.Length; i++)
 				{
 					src[i].Create();
-					Graphics.Blit( i % 2 == 0 ? Texture2D.redTexture : Texture2D.grayTexture, src[i]);
+					var main = Camera.main;
+					var go = new GameObject("cam-" + i);
+					go.transform.SetParent(main.transform, false);
+					go.transform.localPosition = new Vector3(i == 0 ? -0.032f : 0.032f, 0, 0);
+					go.transform.localRotation = Quaternion.identity;
+					var cam = go.AddComponent<Camera>();
+					cam.fieldOfView = 50;
+					cam.targetTexture = src[i];
 				}
 			}
 
-			bp.destRect = new Rect(0, 0, 1 / (float)src.Length, 1);
+			var width = 1 / (float) src.Length;
+			bp.destRect = new Rect(blitParameterIndex * width, 0, width, 1);
 			bp.srcTex = src[blitParameterIndex];
 			blitParameter = bp;
 		}
