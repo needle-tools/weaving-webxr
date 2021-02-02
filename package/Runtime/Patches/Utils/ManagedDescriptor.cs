@@ -43,9 +43,9 @@ namespace needle.weaver.webxr.Utils
 		public IntPtr IdPointer => IdHandle.IsAllocated ? IdHandle.AddrOfPinnedObject() : IntPtr.Zero;
 		public IntPtr SubsystemPointer => SubsystemHandle.IsAllocated ? GCHandle.ToIntPtr(SubsystemHandle) : IntPtr.Zero;
 
+
 		public bool TryGetDescriptorId(IntPtr ptr, out string id)
 		{
-			// Debug.Log("Try get id " + ptr + " / " + IdPointer + ", " + IdHandle.IsAllocated);
 			if (IdHandle.IsAllocated && ptr == IdPointer)
 			{
 				id = Id;
@@ -66,6 +66,8 @@ namespace needle.weaver.webxr.Utils
 
 		public void Dispose()
 		{
+			Debug.Log("Dispose " + Id);
+
 			if (IdHandle.IsAllocated)
 				IdHandle.Free();
 

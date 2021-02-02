@@ -20,6 +20,7 @@ namespace needle.weaver.webxr
 			ModuleDefinition.ForEachMethod(def =>
 			{
 				if (!def.IsConstructor) return;
+				// if (!def.FullName.Contains("RenderPass")) return;
 				if (!PatchMethodDatabase.TryGetPatch<ConstructorInfo>(def, skipDisabled, out var res))
 					return;
 				// var res = TryFindPatchMember(def, constructors);
@@ -39,7 +40,7 @@ namespace needle.weaver.webxr
 			
 			ModuleDefinition.ForEachMethod(def =>
 			{
-				// if (!def.Name.Contains("GetInstances")) return;
+				// if (!def.FullName.Contains("RenderPass")) return;
 				// if(!def.Name.Contains("ReportSingleSubsystemAnalytics")) return;
 				// if (!def.Name.Contains("GetDeviceAtXRNode")) return;
 				if (!PatchMethodDatabase.TryGetPatch<MethodInfo>(def, skipDisabled, out var res))
@@ -57,6 +58,7 @@ namespace needle.weaver.webxr
 			// patch properties
 			ModuleDefinition.ForEachProperty(def =>
 			{
+				// if (!def.FullName.Contains("RenderPass")) return;
 				if (!PatchMethodDatabase.TryGetPatch<PropertyInfo>(def, skipDisabled, out var res))
 					return;
 				var patch = res.patch;

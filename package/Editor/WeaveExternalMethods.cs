@@ -12,24 +12,23 @@ namespace needle.weaver.webxr
 		{
 			int count = 0;
 			var patchedMethods = "";
-			foreach(var type in ModuleDefinition.Types)
+
+			ModuleDefinition.ForEachMethod(method =>
 			{
-			    foreach (var method in type.Methods)
-			    {
-				    try
-				    {
-					    if (method.AddExternalMethodBody())
-					    {
-						    patchedMethods += method.FullName + "\n";
-						    ++count;
-					    }
-				    }
-				    catch (Exception e)
-				    {
-					    Debug.LogException(e);
-				    }
-			    }
-			}
+				try
+				{
+					if (method.AddExternalMethodBody())
+					{
+						patchedMethods += method.FullName + "\n";
+						++count;
+					}
+				}
+				catch (Exception e)
+				{
+					Debug.LogException(e);
+				}
+			});
+			
 			Debug.Log("Patched " + count + " external methods:\n" + patchedMethods);
 		}
 

@@ -17,6 +17,9 @@ namespace needle.weaver.webxr
 
 		private MethodInfo getBindingMethod;
 
+#if DEVELOPMENT_BUILD
+		private static readonly List<IntPtr> failedList = new List<IntPtr>();
+#endif
 
 		public string id
 		{
@@ -28,6 +31,15 @@ namespace needle.weaver.webxr
 					if (di.TryGetDescriptorId(m_Ptr, out var _id))
 						return _id;
 				}
+				
+
+#if DEVELOPMENT_BUILD
+				if (!failedList.Contains(m_Ptr))
+				{
+					failedList.Add(m_Ptr);
+					Debug.LogWarning("Could not find descriptor for " + m_Ptr + ". Available:\n" + string.Join("\n", ManagedDescriptor.Instances));
+				}
+#endif
 
 				if (getBindingMethod == null)
 				{
