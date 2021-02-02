@@ -1,5 +1,7 @@
 ﻿using needle.Weaver;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
+using UnityEngine.Rendering;
 using UnityEngine.XR;
 
 namespace needle.weaver.webxr
@@ -47,6 +49,7 @@ namespace needle.weaver.webxr
 			Debug.Log("Get blit parameter " + blitParameterIndex);
 			var bp = new XRDisplaySubsystem.XRBlitParams();
 			bp.srcRect = new Rect(0, 0, 1, 1);
+
 			
 			if (src == null)
 			{
@@ -65,6 +68,7 @@ namespace needle.weaver.webxr
 					go.transform.localRotation = Quaternion.identity;
 					var cam = go.AddComponent<Camera>();
 					cam.fieldOfView = 50;
+					cam.stereoTargetEye = i == 0 ?StereoTargetEyeMask.Left : StereoTargetEyeMask.Right;
 					cam.targetTexture = src[i];
 				}
 			}
@@ -72,6 +76,7 @@ namespace needle.weaver.webxr
 			var width = 1 / (float) src.Length;
 			bp.destRect = new Rect(blitParameterIndex * width, 0, width, 1);
 			bp.srcTex = src[blitParameterIndex];
+			bp.srcTexArraySlice = blitParameterIndex;
 			blitParameter = bp;
 		}
 	}

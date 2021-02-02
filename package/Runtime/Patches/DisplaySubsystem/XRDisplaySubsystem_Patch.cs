@@ -4,6 +4,7 @@ using System.Security.Permissions;
 using needle.Weaver;
 using needle.weaver.webxr.Utils;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.XR;
 
@@ -53,27 +54,32 @@ namespace needle.weaver.webxr
 		public new float scaleOfAllRenderTargets => 1;
 
 
-		public new TextureLayout textureLayout { get; set; } = TextureLayout.SeparateTexture2Ds;
+		public new TextureLayout textureLayout { get; set; } = TextureLayout.Texture2DArray;
 
-		public new TextureLayout supportedTextureLayouts => TextureLayout.SeparateTexture2Ds;
+		public new TextureLayout supportedTextureLayouts => TextureLayout.Texture2DArray;
 
-		public new int GetRenderPassCount() => 2;
+		public new int GetRenderPassCount() => 1;
 
+		public static Texture2DArray array;
 		private bool Internal_TryGetRenderPass(
 			int renderPassIndex,
 			out XRRenderPass renderPass)
 		{
 			Debug.Log("Get render pass index " + renderPassIndex);
 			renderPass = new XRRenderPass();
-			if (renderPassIndex >= rts.Count)
+			
+			if(rts.Count <= 0)
+			// if (renderPassIndex >= rts.Count)
 			{
 				var rt = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.Default, 0);
+				rt.depth = 2;
+				rt.dimension = TextureDimension.Tex2DArray;
 				rt.Create();
 				rts.Add(rt);
 			}
 
-			renderPass.renderTarget = rts[renderPassIndex];
-			renderPass.renderTargetDesc = rts[renderPassIndex].descriptor;
+			renderPass.renderTarget = rts[0];
+			renderPass.renderTargetDesc = rts[0].descriptor;
 			renderPass.shouldFillOutDepth = true;
 			renderPass.cullingPassIndex = 0;
 			renderPass.renderPassIndex = renderPassIndex;
