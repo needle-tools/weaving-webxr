@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.XR;
 
 namespace needle.weaver.webxr
 {
@@ -25,8 +26,8 @@ namespace needle.weaver.webxr
 			var field = type.GetField("s_IntegratedSubsystems", (BindingFlags) ~0);
 			if (field == null) Debug.LogError("Could not get integrated subsystems list");
 			var list = field?.GetValue(null) as List<IntegratedSubsystem>;
-			var my = XRInputSubsystem_Patch.Instance;
-			list?.Add(my);
+			list?.Add(XRInputSubsystem_Patch.Instance);
+			list?.Add(XRDisplaySubsystem_Patch.Instance);
 
 			var ml = new List<ISubsystem>();
 			SubsystemManager.GetInstances(ml);

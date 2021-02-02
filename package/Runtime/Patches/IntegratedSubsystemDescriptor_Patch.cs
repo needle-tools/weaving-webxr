@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using needle.Weaver;
+using needle.weaver.webxr.Utils;
 using UnityEngine;
 
 namespace needle.weaver.webxr
@@ -15,11 +17,18 @@ namespace needle.weaver.webxr
 
 		private MethodInfo getBindingMethod;
 
+		internal static List<ManagedDescriptor> DescriptorIds = new List<ManagedDescriptor>();
+
 		public string id
 		{
 			get
 			{
-				if (XRInputSubsystem_Patch.IsDescriptorId(m_Ptr)) return XRInputSubsystem_Patch.DescriptorId;
+				for (var index = DescriptorIds.Count - 1; index >= 0; index--)
+				{
+					var di = DescriptorIds[index];
+					if (di.TryGetDescriptorId(m_Ptr, out var _id))
+						return _id;
+				}
 
 				if (getBindingMethod == null)
 				{

@@ -1,12 +1,12 @@
 using needle.Weaver;
+using needle.weaver.webxr.Utils;
 using UnityEngine;
 
+// ReSharper disable SuspiciousTypeConversion.Global
 #pragma warning disable 108,114
 
 namespace needle.weaver.webxr
-{
-	// TODO: figure out why patching base types does not work yet
-	
+{	
 	[NeedlePatch(typeof(IntegratedSubsystem))]
 	internal class IntegratedSubsystem_Patch
 	{
@@ -15,28 +15,27 @@ namespace needle.weaver.webxr
 		public void Start()
 		{
 			isRunning = true;
-			// Debug.Log(this);
-			if (this.GetType() == typeof(XRInputSubsystem_Patch))
+			if (this is ISubsystemLifecycleCallbacks ic)
 			{
-				XRInputSubsystem_Patch.Instance.OnStart();
+				ic.OnStart();
 			}
 		}
 		
 		public void Stop()
 		{
 			isRunning = false;
-			if (this.GetType() == typeof(XRInputSubsystem_Patch))
+			if (this is ISubsystemLifecycleCallbacks ic)
 			{
-				XRInputSubsystem_Patch.Instance.OnStop();
+				ic.OnStop();
 			}
 		}
 		
 		public void Destroy()
 		{
 			isRunning = false;
-			if (this.GetType() == typeof(XRInputSubsystem_Patch))
+			if (this is ISubsystemLifecycleCallbacks ic)
 			{
-				XRInputSubsystem_Patch.Instance.OnDestroy();
+				ic.OnDestroy();
 			}
 		}
 		

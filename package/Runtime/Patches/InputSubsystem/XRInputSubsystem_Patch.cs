@@ -1,61 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
 using needle.Weaver;
+using needle.weaver.webxr.Utils;
 using UnityEngine;
 using UnityEngine.XR;
-using Random = UnityEngine.Random;
 
 // disable hide member warning
 #pragma warning disable 108,114
 
 namespace needle.weaver.webxr
 {
-	[NeedlePatch(typeof(UnityEngine.XR.XRInputSubsystem))]
-	internal class XRInputSubsystem_Patch : UnityEngine.XR.XRInputSubsystem
+	[NeedlePatch(typeof(XRInputSubsystem))]
+	internal class XRInputSubsystem_Patch : XRInputSubsystem, ISubsystemLifecycleCallbacks
 	{
-		private static GCHandle _descriptorIdPtr;
-		private static GCHandle _subsystemInstanceHandle;
-
-		internal const string DescriptorId = "com.needle.webxr.input";
-		internal static bool IsDescriptorId(IntPtr ptr) => _descriptorIdPtr.IsAllocated && _descriptorIdPtr.AddrOfPinnedObject() == ptr;
-		
-		private static readonly Lazy<XRInputSubsystem_Patch> _instance = new Lazy<XRInputSubsystem_Patch>(() =>
-		{
-			var subsystem = new XRInputSubsystem_Patch();
-			var descriptor = new XRInputSubsystemDescriptor();
-
-			var idPtr = typeof(IntegratedSubsystemDescriptor).GetField("m_Ptr", (BindingFlags) ~0);
-			if (idPtr != null)
-			{
-				_descriptorIdPtr = GCHandle.Alloc(DescriptorId, GCHandleType.Pinned);
-				var ptr = _descriptorIdPtr.AddrOfPinnedObject();
-				Debug.Log("ID POINTER " + ptr);
-				idPtr.SetValue(descriptor, ptr);
-			}
-			
-			var ptrField = typeof(IntegratedSubsystem).GetField("m_Ptr", (BindingFlags) ~0);
-			if (ptrField != null)
-			{
-				_subsystemInstanceHandle = GCHandle.Alloc(subsystem);
-				var ptr = GCHandle.ToIntPtr(_subsystemInstanceHandle);
-				ptrField.SetValue(subsystem, ptr);
-			}
-			else Debug.LogWarning("Could not set instance pointer");
-			
-			var descriptorField = typeof(IntegratedSubsystem).GetField("m_SubsystemDescriptor", (BindingFlags) ~0);
-			if (descriptorField != null)
-			{
-				descriptorField.SetValue(subsystem, descriptor);
-			}
-			else Debug.LogWarning("Could not set descriptor");
-			
-			return subsystem;
-		});
+		private static readonly Lazy<XRInputSubsystem_Patch> _instance = new Lazy<XRInputSubsystem_Patch>( () => IntegratedSubsystemsHelper.CreateInstance<XRInputSubsystem_Patch, XRInputSubsystemDescriptor>( "com.needle.webxr.input"));
 		
 		public static XRInputSubsystem_Patch Instance => _instance.Value;
 		internal static readonly List<MockInputDevice> InputDevices = new List<MockInputDevice>();
@@ -63,21 +22,20 @@ namespace needle.weaver.webxr
 		internal static TrackingOriginModeFlags SupportedTrackingOriginMode = TrackingOriginModeFlags.Floor | TrackingOriginModeFlags.Device;
 		private static TrackingOriginModeFlags currentTrackingMode = TrackingOriginModeFlags.Device;
 
-		internal void OnStart()
+		public void OnStart()
 		{
-			Debug.Log("OnStart");
+			Debug.Log("OnStart called");
 		}
 
-		internal void OnStop()
+		public void OnStop()
 		{
 			
 		}
 
-		internal void OnDestroy()
+		public void OnDestroy()
 		{
 			
 		}
-		
 		
 		// ----------------------- patched methods:
 		
