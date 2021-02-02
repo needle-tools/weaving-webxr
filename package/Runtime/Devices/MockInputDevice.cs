@@ -40,6 +40,7 @@ namespace needle.weaver.webxr
 			this.Id = _idCounter++;
 			this.Name = name;
 			this.Node = node;
+			Debug.Log("Created new MockDevice: " + name + ", id=" + Id);
 		}
 
 		public void AddFeature<T>(InputFeatureUsage<T> usage, Func<T> getValue, XRNodeUsage xrNodeUsage = null)

@@ -18,11 +18,18 @@ namespace needle.weaver.webxr
 			{
 				str += "\n";
 				str += sub + ", running: " + sub.running;
-				
+
+				void DescriptorInfo(ISubsystemDescriptor desc)
+				{
+					str += ", Has Descriptor? " + (desc != null);
+					str += ", ID: " + desc?.id;
+				}
+
+				if (sub is XRDisplaySubsystem dp) DescriptorInfo(dp.SubsystemDescriptor);
+
 				if (sub is XRInputSubsystem xrSubsystem)
 				{
-					str += ", Has Descriptor? " + (xrSubsystem?.SubsystemDescriptor != null);
-					str += ", ID: " + xrSubsystem?.SubsystemDescriptor?.id;
+					DescriptorInfo(xrSubsystem.SubsystemDescriptor);
 					str += ", disablesLegacyInput: " + xrSubsystem?.SubsystemDescriptor?.disablesLegacyInput;
 					str += ", trackingMode: " + xrSubsystem.GetTrackingOriginMode() + ", supported trackingModes: " +
 					       xrSubsystem.GetSupportedTrackingOriginModes();

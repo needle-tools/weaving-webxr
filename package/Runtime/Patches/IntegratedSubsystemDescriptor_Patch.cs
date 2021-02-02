@@ -17,15 +17,14 @@ namespace needle.weaver.webxr
 
 		private MethodInfo getBindingMethod;
 
-		internal static List<ManagedDescriptor> DescriptorIds = new List<ManagedDescriptor>();
 
 		public string id
 		{
 			get
 			{
-				for (var index = DescriptorIds.Count - 1; index >= 0; index--)
+				for (var index = ManagedDescriptor.Instances.Count - 1; index >= 0; index--)
 				{
-					var di = DescriptorIds[index];
+					var di = ManagedDescriptor.Instances[index];
 					if (di.TryGetDescriptorId(m_Ptr, out var _id))
 						return _id;
 				}
