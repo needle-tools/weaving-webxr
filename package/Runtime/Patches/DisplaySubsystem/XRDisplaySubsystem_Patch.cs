@@ -56,7 +56,7 @@ namespace needle.weaver.webxr
 
 		public new int GetRenderPassCount() => 1;
 
-		private new bool Internal_TryGetRenderPass(
+		private bool Internal_TryGetRenderPass(
 			int renderPassIndex,
 			out XRRenderPass renderPass)
 		{
@@ -76,60 +76,7 @@ namespace needle.weaver.webxr
 			out ScriptableCullingParameters scriptableCullingParameters)
 		{
 			Debug.Log("Get culling index " + cullingPassIndex);
-			scriptableCullingParameters = new ScriptableCullingParameters();
-			scriptableCullingParameters.cullingMatrix = camera.cullingMatrix;
-			scriptableCullingParameters.cullingOptions = CullingOptions.Stereo;
-			scriptableCullingParameters.cameraProperties = CameraPropertiesExtensions.Create(new CameraPropertiesData()
-				{
-					screenRect = new Rect(0, 0, 1, 1),
-					viewDir = camera.transform.forward,
-					projectionNear = camera.nearClipPlane,
-					projectionFar = camera.farClipPlane,
-					cameraNear = camera.nearClipPlane,
-					cameraFar = camera.farClipPlane,
-					cameraAspect = 1,
-					cameraToWorld = camera.transform.localToWorldMatrix,
-					actualWorldToClip = camera.worldToCameraMatrix,
-					implicitProjection = camera.projectionMatrix,
-					stereoWorldToClipRight = camera.GetStereoProjectionMatrix(Camera.StereoscopicEye.Right),
-					stereoWorldToClipLeft = camera.GetStereoProjectionMatrix(Camera.StereoscopicEye.Left),
-					worldToCamera = camera.transform.worldToLocalMatrix,
-					up = camera.transform.up,
-					right = camera.transform.right,
-					transformDirection = camera.transform.forward,
-					cameraEuler = camera.transform.eulerAngles,
-					velocity = Vector3.zero,
-					farPlaneWorldSpaceLength = 10,
-					rendererCount = 0,
-					baseFarDistance = 10,
-					shadowCullCenter = Vector3.zero,
-					layerCullSpherical = 0,
-					coreCameraValues = new CameraCorePropertiesData()
-					{
-						filterMode = 0,
-						instanceID = camera.GetInstanceID(),
-						cullingMask = (uint) camera.cullingMask,
-					},
-					cameraType = 0,
-					projectionIsOblique = 0,
-					isImplicitProjectionMatrix = 0
-				});
-			scriptableCullingParameters.lodParameters = new LODParameters()
-			{
-				fieldOfView = 60,
-				cameraPosition = camera.transform.position,
-				cameraPixelHeight = 100,
-				isOrthographic = camera.orthographic,
-				orthoSize = camera.orthographicSize
-			};
-			scriptableCullingParameters.cameraProperties.SetCameraCullingPlane(0, new Plane(Vector3.forward, 10));
-			scriptableCullingParameters.stereoProjectionMatrix = camera.GetStereoProjectionMatrix(Camera.StereoscopicEye.Left);
-			scriptableCullingParameters.stereoViewMatrix = camera.GetStereoViewMatrix(Camera.StereoscopicEye.Left);
-			scriptableCullingParameters.maximumVisibleLights = 1;
-			scriptableCullingParameters.stereoSeparationDistance = 0.625f;
-			scriptableCullingParameters.cullingPlaneCount = 1;
-			scriptableCullingParameters.SetCullingPlane(0, new Plane(Vector3.forward, 10));
-			scriptableCullingParameters.SetLayerCullingDistance(0, 10);
+			camera.TryGetCullingParameters(out scriptableCullingParameters);
 			return true;
 		}
 
