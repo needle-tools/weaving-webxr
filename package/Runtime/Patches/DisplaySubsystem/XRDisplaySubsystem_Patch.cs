@@ -5,6 +5,7 @@ using needle.weaver.webxr.Utils;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR;
+
 // ReSharper disable UnusedMember.Global
 
 namespace needle.weaver.webxr
@@ -13,12 +14,12 @@ namespace needle.weaver.webxr
 	public class XRDisplaySubsystem_Patch : XRDisplaySubsystem, ISubsystemLifecycleCallbacks
 	{
 		public static string Id => "com.needle.webxr.display";
-		
+
 		private static readonly Lazy<XRDisplaySubsystem_Patch> _instance = new Lazy<XRDisplaySubsystem_Patch>(() =>
 			IntegratedSubsystemsHelper.CreateInstance<XRDisplaySubsystem_Patch, XRDisplaySubsystemDescriptor>(Id));
 
 		public static XRDisplaySubsystem_Patch Instance => _instance.Value;
-		
+
 		public void OnStart()
 		{
 			Debug.Log("Started display subsystem");
@@ -39,16 +40,16 @@ namespace needle.weaver.webxr
 			rt.Create();
 			return rt;
 		});
-		
+
 		// ------------------------ patched methods
 
 		public new bool displayOpaque => true;
-		
+
 		public new float scaleOfAllViewports => 1;
-		
+
 		public new float scaleOfAllRenderTargets => 1;
 
-		
+
 		public new XRDisplaySubsystem.TextureLayout textureLayout { get; set; } = TextureLayout.SeparateTexture2Ds;
 
 		public new XRDisplaySubsystem.TextureLayout supportedTextureLayouts => TextureLayout.SeparateTexture2Ds;
@@ -78,7 +79,41 @@ namespace needle.weaver.webxr
 			scriptableCullingParameters = new ScriptableCullingParameters();
 			scriptableCullingParameters.cullingMatrix = camera.cullingMatrix;
 			scriptableCullingParameters.cullingOptions = CullingOptions.Stereo;
-			scriptableCullingParameters.cameraProperties = new CameraProperties();
+			scriptableCullingParameters.cameraProperties = CameraPropertiesExtensions.Create(new CameraPropertiesData()
+				{
+					screenRect = new Rect(0, 0, 1, 1),
+					viewDir = camera.transform.forward,
+					projectionNear = camera.nearClipPlane,
+					projectionFar = camera.farClipPlane,
+					cameraNear = camera.nearClipPlane,
+					cameraFar = camera.farClipPlane,
+					cameraAspect = 1,
+					cameraToWorld = camera.transform.localToWorldMatrix,
+					actualWorldToClip = camera.worldToCameraMatrix,
+					implicitProjection = camera.projectionMatrix,
+					stereoWorldToClipRight = camera.GetStereoProjectionMatrix(Camera.StereoscopicEye.Right),
+					stereoWorldToClipLeft = camera.GetStereoProjectionMatrix(Camera.StereoscopicEye.Left),
+					worldToCamera = camera.transform.worldToLocalMatrix,
+					up = camera.transform.up,
+					right = camera.transform.right,
+					transformDirection = camera.transform.forward,
+					cameraEuler = camera.transform.eulerAngles,
+					velocity = Vector3.zero,
+					farPlaneWorldSpaceLength = 10,
+					rendererCount = 0,
+					baseFarDistance = 10,
+					shadowCullCenter = Vector3.zero,
+					layerCullSpherical = 0,
+					coreCameraValues = new CameraCorePropertiesData()
+					{
+						filterMode = 0,
+						instanceID = camera.GetInstanceID(),
+						cullingMask = (uint) camera.cullingMask,
+					},
+					cameraType = 0,
+					projectionIsOblique = 0,
+					isImplicitProjectionMatrix = 0
+				});
 			scriptableCullingParameters.lodParameters = new LODParameters()
 			{
 				fieldOfView = 60,
@@ -96,9 +131,8 @@ namespace needle.weaver.webxr
 			scriptableCullingParameters.SetCullingPlane(0, new Plane(Vector3.forward, 10));
 			scriptableCullingParameters.SetLayerCullingDistance(0, 10);
 			return true;
-			
 		}
-		
+
 		public new bool GetMirrorViewBlitDesc(
 			RenderTexture mirrorRt,
 			out XRDisplaySubsystem.XRMirrorViewBlitDesc outDesc,
@@ -115,11 +149,11 @@ namespace needle.weaver.webxr
 			ref Vector3 normal,
 			ref Vector3 velocity)
 		{
-			
 		}
 
 		private bool didLog = false;
 		private float _zFar;
+
 		public new float zFar
 		{
 			get => _zFar;
@@ -131,7 +165,7 @@ namespace needle.weaver.webxr
 				Debug.Log("set zFar " + zFar);
 			}
 		}
-		
+
 		public new void SetPreferredMirrorBlitMode(int blitMode)
 		{
 			Debug.Log(nameof(SetPreferredMirrorBlitMode) + ": " + blitMode);
@@ -140,7 +174,7 @@ namespace needle.weaver.webxr
 
 		public new RenderTexture GetRenderTextureForRenderPass(int renderPass)
 		{
-			Debug.Log(nameof(GetRenderTextureForRenderPass) + ": " +renderPass);
+			Debug.Log(nameof(GetRenderTextureForRenderPass) + ": " + renderPass);
 			return null;
 		}
 
@@ -148,6 +182,5 @@ namespace needle.weaver.webxr
 		{
 			Debug.Log(nameof(SetMSAALevel) + ", " + level);
 		}
-		
 	}
 }
