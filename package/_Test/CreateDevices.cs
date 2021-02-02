@@ -13,7 +13,7 @@ namespace needle.weaver.webxr
 			
 			SubsystemAPI.RegisterInputDevice(MockDeviceBuilder.CreateHeadset(
 					() => true,
-					() => Vector3.LerpUnclamped(new Vector3(0,0,-.5f), Vector3.up * .2f, Mathf.Sin(Time.time)),
+					() => Vector3.LerpUnclamped(new Vector3(0,.1f,-.2f), Vector3.up * .12f, Mathf.Sin(Time.time)),
 					() => _rotation
 				)
 			);
@@ -41,7 +41,7 @@ namespace needle.weaver.webxr
 
 		private void Update()
 		{
-			_rotation = Quaternion.Lerp(Quaternion.Euler(0, -20, 0), Quaternion.Euler(0, 20, 0), Mathf.Sin(Time.time) * .5f + .5f);
+			_rotation = Quaternion.Lerp(Quaternion.Euler(-20, -20, 0), Quaternion.Euler(-20, 20, 0), Mathf.Sin(Time.time) * .5f + .5f);
 		}
 	}
 }

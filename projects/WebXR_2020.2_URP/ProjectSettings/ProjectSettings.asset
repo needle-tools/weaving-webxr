@@ -136,6 +136,8 @@ PlayerSettings:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 6407852768682012410, guid: 989f33ecf0d223b468e79da79cb969da, type: 2}
   - {fileID: 11400000, guid: 660afee40e41c19408868c03c3fb706f, type: 2}
   - {fileID: 0}
@@ -683,7 +685,7 @@ PlayerSettings:
     m_VersionCode: 1
     m_VersionName: 
   apiCompatibilityLevel: 6
-  activeInputHandler: 0
+  activeInputHandler: 2
   cloudProjectId: 
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []

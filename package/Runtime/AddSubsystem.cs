@@ -28,7 +28,7 @@ namespace needle.weaver.webxr
 		private static IEnumerable<IntegratedSubsystem> Subsystems()
 		{
 			yield return XRInputSubsystem_Patch.Instance;
-			yield return XRDisplaySubsystem_Patch.Instance;
+			// yield return XRDisplaySubsystem_Patch.Instance;
 		}
 
 		private static void RegisterSubsystems()

@@ -135,7 +135,7 @@ PrefabInstance:
     - target: {fileID: 3586947693440984736, guid: b1f2da7204ce323408c2988aed85c136,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 480
+      value: 800
       objectReference: {fileID: 0}
     - target: {fileID: 3586947693440984736, guid: b1f2da7204ce323408c2988aed85c136,
         type: 3}
@@ -225,7 +225,7 @@ PrefabInstance:
     - target: {fileID: 3586947694240599386, guid: b1f2da7204ce323408c2988aed85c136,
         type: 3}
       propertyPath: m_Name
-      value: World
+      value: World 3d XRRig
       objectReference: {fileID: 0}
     - target: {fileID: 3586947694240599389, guid: b1f2da7204ce323408c2988aed85c136,
         type: 3}
