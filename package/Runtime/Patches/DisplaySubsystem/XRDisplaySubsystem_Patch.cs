@@ -79,10 +79,22 @@ namespace needle.weaver.webxr
 			scriptableCullingParameters.cullingMatrix = camera.cullingMatrix;
 			scriptableCullingParameters.cullingOptions = CullingOptions.Stereo;
 			scriptableCullingParameters.cameraProperties = new CameraProperties();
+			scriptableCullingParameters.lodParameters = new LODParameters()
+			{
+				fieldOfView = 60,
+				cameraPosition = camera.transform.position,
+				cameraPixelHeight = 100,
+				isOrthographic = camera.orthographic,
+				orthoSize = camera.orthographicSize
+			};
+			scriptableCullingParameters.cameraProperties.SetCameraCullingPlane(0, new Plane(Vector3.forward, 10));
 			scriptableCullingParameters.stereoProjectionMatrix = camera.GetStereoProjectionMatrix(Camera.StereoscopicEye.Left);
 			scriptableCullingParameters.stereoViewMatrix = camera.GetStereoViewMatrix(Camera.StereoscopicEye.Left);
 			scriptableCullingParameters.maximumVisibleLights = 1;
 			scriptableCullingParameters.stereoSeparationDistance = 0.625f;
+			scriptableCullingParameters.cullingPlaneCount = 1;
+			scriptableCullingParameters.SetCullingPlane(0, new Plane(Vector3.forward, 10));
+			scriptableCullingParameters.SetLayerCullingDistance(0, 10);
 			return true;
 			
 		}
@@ -94,7 +106,7 @@ namespace needle.weaver.webxr
 		{
 			Debug.Log("GetMirrorViewBlitDesc");
 			outDesc = new XRMirrorViewBlitDesc();
-			outDesc.blitParamsCount = 1;
+			outDesc.blitParamsCount = 2;
 			return true;
 		}
 

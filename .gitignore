@@ -6,3 +6,4 @@ projects/**/Logs
 projects/**/.idea
 projects/**/*.csproj
 projects/**/*.sln
+projects/**/*.sln.DotSettings.user
