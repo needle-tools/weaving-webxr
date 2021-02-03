@@ -8,7 +8,7 @@ using UnityEngine;
 namespace needle.weaver.webxr
 {	
 	[NeedlePatch(typeof(IntegratedSubsystem))]
-	internal class IntegratedSubsystem_Patch : IntegratedSubsystem
+	internal class IntegratedSubsystem_Patch
 	{
 		private bool isRunning;
 		
