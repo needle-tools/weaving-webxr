@@ -70,7 +70,7 @@ namespace needle.weaver.webxr
 			{
 				if (!cam)
 				{
-					if(!main)
+					if (!main)
 					{
 						main = Camera.main;
 						if (!main) main = Object.FindObjectOfType<Camera>();
@@ -82,7 +82,7 @@ namespace needle.weaver.webxr
 							return;
 						}
 					}
-					
+
 					var go = new GameObject(name);
 					go.transform.SetParent(main.transform, false);
 					go.transform.localPosition = new Vector3(x, 0, 0);
@@ -94,16 +94,17 @@ namespace needle.weaver.webxr
 					Debug.Log("Created eye camera " + name, go);
 #endif
 				}
-				
+
 #if DEVELOPMENT_BUILD
 				Debug.Log(projection);
 #endif
-				
+
 				// if (projection == Matrix4x4.zero)
 				// {
 				// 	projection = main ? main.projectionMatrix : Matrix4x4.identity;
 				// }
-				// cam.projectionMatrix = projection;
+				if (projection != Matrix4x4.zero)
+					cam.projectionMatrix = projection;
 				cam.targetTexture = tex;
 			}
 
@@ -163,7 +164,7 @@ namespace needle.weaver.webxr
 			// else if (provider.ProjectionLeft == Matrix4x4.zero || provider.ProjectionRight == Matrix4x4.zero) 
 			// 	blitCount = 0;
 			// else if (!left || !right) blitCount = 0;
-			
+
 #if DEVELOPMENT_BUILD
 			Debug.Log("Blits: " + blitCount);
 #endif
