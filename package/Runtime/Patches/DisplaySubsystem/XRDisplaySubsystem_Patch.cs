@@ -35,53 +35,53 @@ namespace needle.weaver.webxr
 		{
 		}
 
-		private readonly Lazy<RenderTexture> RenderTexture = new Lazy<RenderTexture>(() =>
+		private static IDisplaySubsystemBehaviour _behaviour;
+
+		internal static IDisplaySubsystemBehaviour behaviour
 		{
-			Debug.Log("Create render target");
-			var rt = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.Default, 0);
-			rt.Create();
-			return rt;
-		});
-
-		private RenderTexture target;
-
+			get
+			{
+				if (_behaviour == null)
+				{
+					_behaviour = new SinglePassInstanced();
+					_behaviour.OnAttach();
+				}
+				return _behaviour;
+			}
+		}
+		
 		// ------------------------ patched methods
 
-		public new bool displayOpaque => true;
+		public new bool displayOpaque => behaviour.displayOpaque;
 
-		public new float scaleOfAllViewports => 1;
+		public new float scaleOfAllViewports => behaviour.scaleOfAllViewports;
 
-		public new float scaleOfAllRenderTargets => 1;
+		public new float scaleOfAllRenderTargets => behaviour.scaleOfAllRenderTargets;
 
 
-		public new TextureLayout textureLayout { get; set; } = TextureLayout.Texture2DArray;
+		public new TextureLayout textureLayout
+		{
+			get => behaviour.textureLayout;
+			set => Debug.Log("Todo: check if the current behaviour is supports " + value + " and if not switch it");
+		}
 
-		public new TextureLayout supportedTextureLayouts => TextureLayout.Texture2DArray;
+		public new TextureLayout supportedTextureLayouts
+		{
+			get
+			{
+				Debug.Log("Todo: loop through list of interface implementation instances and get all supported layouts");
+				return behaviour.textureLayout;
+			}
+		}
 
-		public new int GetRenderPassCount() => 1;
+		public new int GetRenderPassCount() => behaviour.GetRenderPassCount();
 
 		private bool Internal_TryGetRenderPass(
 			int renderPassIndex,
 			out XRRenderPass renderPass)
 		{
 			Debug.Log("Get render pass index " + renderPassIndex);
-			renderPass = new XRRenderPass();
-			
-			if(!target)
-			// if (renderPassIndex >= rts.Count)
-			{
-				target = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.Default, 0);
-				target.depth = 2;
-				target.dimension = TextureDimension.Tex2DArray;
-				target.Create();
-			}
-
-			renderPass.renderTarget = target;
-			renderPass.renderTargetDesc = target.descriptor;
-			renderPass.shouldFillOutDepth = true;
-			renderPass.cullingPassIndex = 0;
-			renderPass.renderPassIndex = renderPassIndex;
-			return true;
+			return behaviour.Internal_TryGetRenderPass(renderPassIndex, out renderPass);
 		}
 
 		private bool Internal_TryGetCullingParams(
@@ -90,8 +90,7 @@ namespace needle.weaver.webxr
 			out ScriptableCullingParameters scriptableCullingParameters)
 		{
 			Debug.Log("Get culling index " + cullingPassIndex);
-			camera.TryGetCullingParameters(out scriptableCullingParameters);
-			return true;
+			return behaviour.Internal_TryGetCullingParams(camera, cullingPassIndex, out scriptableCullingParameters);
 		}
 
 		public new bool GetMirrorViewBlitDesc(
@@ -100,9 +99,7 @@ namespace needle.weaver.webxr
 			int mode)
 		{
 			Debug.Log("GetMirrorViewBlitDesc");
-			outDesc = new XRMirrorViewBlitDesc();
-			outDesc.blitParamsCount = 2;
-			return true;
+			return behaviour.GetMirrorViewBlitDesc(mirrorRt, out outDesc, mode);
 		}
 
 		private void SetFocusPlane_Injected(
@@ -110,43 +107,24 @@ namespace needle.weaver.webxr
 			ref Vector3 normal,
 			ref Vector3 velocity)
 		{
-		}
-
-		private bool didLog = false;
-		private float _zFar;
-
-		public new float zFar
-		{
-			get => _zFar;
-			set
-			{
-				_zFar = value;
-				if (didLog) return;
-				didLog = true;
-				Debug.Log("set zFar " + zFar);
-			}
+			behaviour.SetFocusPlane_Injected(ref point, ref normal, ref velocity);
 		}
 
 		public new void SetPreferredMirrorBlitMode(int blitMode)
 		{
 			Debug.Log(nameof(SetPreferredMirrorBlitMode) + ": " + blitMode);
+			behaviour.SetPreferredMirrorBlitMode(blitMode);
 		}
-
 
 		public new RenderTexture GetRenderTextureForRenderPass(int renderPass)
 		{
-			// if (renderPass < 0 || renderPass > te.Count)
-			// {
-			// 	Debug.LogError("Requested RenderPass out of range: " + renderPass);
-			// 	return null;
-			// }
 			Debug.Log(nameof(GetRenderTextureForRenderPass) + ": " + renderPass);
-			return target;
+			return behaviour.GetRenderTextureForRenderPass(renderPass);
 		}
 
 		public new void SetMSAALevel(int level)
 		{
-			Debug.Log(nameof(SetMSAALevel) + ", " + level);
+			behaviour.SetMSAALevel(level);
 		}
 	}
 }
