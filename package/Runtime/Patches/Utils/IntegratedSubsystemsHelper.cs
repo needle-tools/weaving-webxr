@@ -10,7 +10,7 @@ namespace needle.weaver.webxr.Utils
 			where TDescriptor : IntegratedSubsystemDescriptor, new()
 		{
 			var subsystem = new TSubsystem();
-			
+
 #if !UNITY_EDITOR && UNITY_WEBGL
 			var descriptor = new TDescriptor();
 			var desc = ManagedDescriptor.CreateAndRegister(id, subsystem);
@@ -35,6 +35,10 @@ namespace needle.weaver.webxr.Utils
 				descriptorField.SetValue(subsystem, descriptor);
 			}
 			else Debug.LogError("Could not set descriptor for " + subsystem);
+
+#if DEVELOPMENT_BUILD
+			Debug.Log("Created instance of " + subsystem);
+#endif
 #endif
 
 			return subsystem;

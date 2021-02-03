@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR;
 
@@ -6,18 +7,24 @@ namespace needle.weaver.webxr
 {
 	public class SinglePassInstanced : IDisplaySubsystemBehaviour
 	{
-		public static Camera Left;
-		public static Camera Right;
-		
 		private RenderTexture target;
-		private RenderTexture[] src;
+		private Camera left, right;
+		private readonly List<RenderTexture> camTargets = new List<RenderTexture>();
 
-		private RenderTexture Target
+		private RenderTexture RenderPassTexture
 		{
 			get
 			{
-				if (!target)
+				if (!target || target.width != Screen.width || target.height != Screen.height)
 				{
+					if (target && target.IsCreated())
+					{
+						target.Release();
+#if DEVELOPMENT_BUILD
+						Debug.Log("Resize RenderPass " + new Vector2(Screen.width, Screen.height));
+#endif
+					}
+
 					target = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.Default, 0);
 					target.depth = 2;
 					target.dimension = TextureDimension.Tex2DArray;
@@ -30,66 +37,128 @@ namespace needle.weaver.webxr
 
 		private void EnsureTextures()
 		{
-			if (src == null)
+			var expectedWidth = (int) (Screen.width * .5f);
+			var expectedHeight = Screen.height;
+
+			for (var i = 0; i < 2; i++)
 			{
-				src = new[]
+				RenderTexture CreateNewTexture(RenderTexture prev, string name)
 				{
-					new RenderTexture((int) (Screen.width * .5f), Screen.height, 0),
-					new RenderTexture((int) (Screen.width * .5f), Screen.height, 0)
-				};
-				for (int i = 0; i < src.Length; i++)
+					if (prev) prev.Release();
+					var t = new RenderTexture(expectedWidth, expectedHeight, 0);
+					t.name = name;
+					t.Create();
+#if DEVELOPMENT_BUILD
+					Debug.Log("Created RenderTarget " + name + ": " + expectedWidth + "x" + expectedHeight);
+#endif
+					return t;
+				}
+
+				if (i >= camTargets.Count)
 				{
-					src[i].Create();
-					var main = Camera.main;
-					var go = new GameObject("cam-" + i);
-					go.transform.SetParent(main.transform, false);
-					go.transform.localPosition = new Vector3(i == 0 ? -0.032f : 0.032f, 0, 0);
-					go.transform.localRotation = Quaternion.identity;
-					var cam = go.AddComponent<Camera>();
-					cam.fieldOfView = 50;
-					cam.stereoTargetEye = i == 0 ? StereoTargetEyeMask.Left : StereoTargetEyeMask.Right;
-					cam.targetTexture = src[i];
-					if (i == 0) Left = cam;
-					else Right = cam;
+					var tex = CreateNewTexture(null, "RT-" + i);
+					camTargets.Add(tex);
+				}
+				else if (camTargets[i].width != expectedWidth || camTargets[i].height != expectedHeight)
+				{
+					camTargets[i] = CreateNewTexture(camTargets[i], "RT-" + i);
 				}
 			}
+
+			static void EnsureCamera(ref Camera cam, string name, float x, StereoTargetEyeMask targetEye, RenderTexture tex, Matrix4x4 projection)
+			{
+				if (!cam)
+				{
+					var main = Camera.main;
+					if (!main) main = Object.FindObjectOfType<Camera>();
+					if (!main)
+					{
+#if DEVELOPMENT_BUILD
+						Debug.Log("No camera found");
+#endif
+						return;
+					}
+					var go = new GameObject(name);
+					go.transform.SetParent(main.transform, false);
+					go.transform.localPosition = new Vector3(x, 0, 0);
+					go.transform.localRotation = Quaternion.identity;
+					cam = go.AddComponent<Camera>();
+					cam.fieldOfView = 50;
+					cam.stereoTargetEye = targetEye;
+#if DEVELOPMENT_BUILD
+					Debug.Log("Created eye camera " + name, go);
+#endif
+				}
+				
+#if DEVELOPMENT_BUILD
+				Debug.Log(projection);
+#endif
+				cam.projectionMatrix = projection == Matrix4x4.zero ? Matrix4x4.identity : projection;
+				cam.targetTexture = tex;
+			}
+
+			if (provider == null) return;
+			EnsureCamera(ref left, "LeftEye", -0.032f, StereoTargetEyeMask.Left, camTargets[0], provider.ProjectionLeft);
+			EnsureCamera(ref right, "RightEye", 0.032f, StereoTargetEyeMask.Right, camTargets[1], provider.ProjectionRight);
+		}
+
+		private IDisplayDataProvider provider;
+
+		public void OnAttach(IDisplayDataProvider prov)
+		{
+			this.provider = prov;
+			EnsureTextures();
+		}
+
+		public void OnDetach(IDisplayDataProvider prov)
+		{
+			if (prov != provider) return;
+			provider = null;
 		}
 
 		public void Dispose()
 		{
 			if (target) target.Release();
 			target = null;
-		}
-
-		public void OnAttach()
-		{
-			EnsureTextures();
-		}
-
-		public void OnDetach()
-		{
+			foreach (var t in camTargets)
+				t.Release();
+			camTargets.Clear();
+			if (left)
+				Object.Destroy(left.gameObject);
+			if (right)
+				Object.Destroy(right.gameObject);
+			left = null;
+			right = null;
 		}
 
 		public void SetPreferredMirrorBlitMode(int blitMode)
 		{
 		}
 
-		public RenderTexture GetRenderTextureForRenderPass(int renderPass) => Target;
+		public RenderTexture GetRenderTextureForRenderPass(int renderPass) => RenderPassTexture;
 
 		public void SetMSAALevel(int level)
 		{
 		}
-		
+
 		public void SetFocusPlane_Injected(ref Vector3 point, ref Vector3 normal, ref Vector3 velocity)
 		{
 		}
 
-		public bool GetMirrorViewBlitDesc(RenderTexture mirrorRt, out XRDisplaySubsystem.XRMirrorViewBlitDesc outDesc, int mode)
+		public XRDisplaySubsystem.XRMirrorViewBlitDesc GetMirrorViewBlitDesc()
 		{
-			Debug.Log("GetMirrorViewBlitDesc");
-			outDesc = new XRDisplaySubsystem.XRMirrorViewBlitDesc();
-			outDesc.blitParamsCount = 2;
-			return true;
+			EnsureTextures();
+			var blitCount = 2;
+			// if (provider == null) blitCount = 0;
+			// else if (provider.ProjectionLeft == Matrix4x4.zero || provider.ProjectionRight == Matrix4x4.zero) 
+			// 	blitCount = 0;
+			// else if (!left || !right) blitCount = 0;
+			
+#if DEVELOPMENT_BUILD
+			Debug.Log("Blits: " + blitCount);
+#endif
+			var outDesc = new XRDisplaySubsystem.XRMirrorViewBlitDesc {blitParamsCount = blitCount};
+			return outDesc;
 		}
 
 		public bool TryGetCullingParams(Camera camera, int cullingPassIndex, out ScriptableCullingParameters scriptableCullingParameters)
@@ -99,11 +168,13 @@ namespace needle.weaver.webxr
 
 		public bool TryGetRenderPass(int renderPassIndex, out XRDisplaySubsystem.XRRenderPass renderPass)
 		{
+#if DEVELOPMENT_BUILD
 			Debug.Log("Get render pass index " + renderPassIndex);
+#endif
 			renderPass = new XRDisplaySubsystem.XRRenderPass
 			{
-				renderTarget = Target,
-				renderTargetDesc = Target.descriptor,
+				renderTarget = RenderPassTexture,
+				renderTargetDesc = RenderPassTexture.descriptor,
 				shouldFillOutDepth = true,
 				cullingPassIndex = 0,
 				renderPassIndex = renderPassIndex
@@ -122,11 +193,13 @@ namespace needle.weaver.webxr
 		public void OnGetBlitParameter(int blitParameterIndex,
 			out XRDisplaySubsystem.XRBlitParams blitParameter)
 		{
+			EnsureTextures();
+
 			var bp = new XRDisplaySubsystem.XRBlitParams();
 			bp.srcRect = new Rect(0, 0, 1, 1);
-			var width = 1 / (float) src.Length;
+			var width = .5f;
 			bp.destRect = new Rect(blitParameterIndex * width, 0, width, 1);
-			bp.srcTex = src[blitParameterIndex];
+			bp.srcTex = camTargets[blitParameterIndex];
 			bp.srcTexArraySlice = blitParameterIndex;
 			blitParameter = bp;
 		}
@@ -136,9 +209,9 @@ namespace needle.weaver.webxr
 		{
 			renderParameter = new XRDisplaySubsystem.XRRenderParameter
 			{
-				projection = camera.projectionMatrix, 
-				viewport = new Rect(0, 0, 1, 1), 
-				textureArraySlice = 0, 
+				projection = camera.projectionMatrix,
+				viewport = new Rect(0, 0, 1, 1),
+				textureArraySlice = 0,
 				view = camera.worldToCameraMatrix
 			};
 		}
