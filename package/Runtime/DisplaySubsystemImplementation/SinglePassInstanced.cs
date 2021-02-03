@@ -91,12 +91,12 @@ namespace needle.weaver.webxr
 			return true;
 		}
 
-		public bool Internal_TryGetCullingParams(Camera camera, int cullingPassIndex, out ScriptableCullingParameters scriptableCullingParameters)
+		public bool TryGetCullingParams(Camera camera, int cullingPassIndex, out ScriptableCullingParameters scriptableCullingParameters)
 		{
 			return camera.TryGetCullingParameters(true, out scriptableCullingParameters);
 		}
 
-		public bool Internal_TryGetRenderPass(int renderPassIndex, out XRDisplaySubsystem.XRRenderPass renderPass)
+		public bool TryGetRenderPass(int renderPassIndex, out XRDisplaySubsystem.XRRenderPass renderPass)
 		{
 			Debug.Log("Get render pass index " + renderPassIndex);
 			renderPass = new XRDisplaySubsystem.XRRenderPass
@@ -118,7 +118,7 @@ namespace needle.weaver.webxr
 		public float scaleOfAllViewports => 1;
 		public bool displayOpaque => true;
 
-		public void GetBlitParameter_Injected(ref XRDisplaySubsystem.XRMirrorViewBlitDesc desc, int blitParameterIndex,
+		public void GetBlitParameter(int blitParameterIndex,
 			out XRDisplaySubsystem.XRBlitParams blitParameter)
 		{
 			var bp = new XRDisplaySubsystem.XRBlitParams();
@@ -130,7 +130,7 @@ namespace needle.weaver.webxr
 			blitParameter = bp;
 		}
 
-		public void GetRenderParameter_Injected(ref XRDisplaySubsystem.XRRenderPass pass, Camera camera, int renderParameterIndex,
+		public void GetRenderParameter(ref XRDisplaySubsystem.XRRenderPass pass, Camera camera, int renderParameterIndex,
 			out XRDisplaySubsystem.XRRenderParameter renderParameter)
 		{
 			renderParameter = new XRDisplaySubsystem.XRRenderParameter
@@ -142,6 +142,6 @@ namespace needle.weaver.webxr
 			};
 		}
 
-		public int GetRenderParameterCount_Injected(ref XRDisplaySubsystem.XRRenderPass pass) => 1;
+		public int GetRenderParameterCount(ref XRDisplaySubsystem.XRRenderPass pass) => 1;
 	}
 }

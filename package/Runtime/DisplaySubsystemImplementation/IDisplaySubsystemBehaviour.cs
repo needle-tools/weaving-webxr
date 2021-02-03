@@ -20,8 +20,8 @@ namespace needle.weaver.webxr
 			ref Vector3 velocity);
 
 		bool GetMirrorViewBlitDesc(RenderTexture mirrorRt, out XRDisplaySubsystem.XRMirrorViewBlitDesc outDesc, int mode);
-		bool Internal_TryGetCullingParams(Camera camera, int cullingPassIndex, out ScriptableCullingParameters scriptableCullingParameters);
-		bool Internal_TryGetRenderPass(int renderPassIndex, out XRDisplaySubsystem.XRRenderPass renderPass);
+		bool TryGetCullingParams(Camera camera, int cullingPassIndex, out ScriptableCullingParameters scriptableCullingParameters);
+		bool TryGetRenderPass(int renderPassIndex, out XRDisplaySubsystem.XRRenderPass renderPass);
 		int GetRenderPassCount();
 		XRDisplaySubsystem.TextureLayout textureLayout { get; }
 		float scaleOfAllRenderTargets { get; }
@@ -30,18 +30,17 @@ namespace needle.weaver.webxr
 
 		
 		//  XRMirrorViewBlitDesc
-		void GetBlitParameter_Injected(
-			ref XRDisplaySubsystem.XRMirrorViewBlitDesc desc,
+		void GetBlitParameter(
 			int blitParameterIndex,
 			out XRDisplaySubsystem.XRBlitParams blitParameter);
 
 		// render pass
-		void GetRenderParameter_Injected(
+		void GetRenderParameter(
 			ref XRDisplaySubsystem.XRRenderPass pass, 
 			Camera camera, 
 			int renderParameterIndex, 
 			out XRDisplaySubsystem.XRRenderParameter renderParameter);
 
-		int GetRenderParameterCount_Injected(ref XRDisplaySubsystem.XRRenderPass pass);
+		int GetRenderParameterCount(ref XRDisplaySubsystem.XRRenderPass pass);
 	}
 }
