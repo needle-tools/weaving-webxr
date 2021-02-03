@@ -135,13 +135,13 @@ namespace needle.weaver.webxr
 
 		public new RenderTexture GetRenderTextureForRenderPass(int renderPass)
 		{
-			if (renderPass < 0 || renderPass > rts.Count)
-			{
-				Debug.LogError("Requested RenderPass out of range: " + renderPass);
-				return null;
-			}
+			// if (renderPass < 0 || renderPass > te.Count)
+			// {
+			// 	Debug.LogError("Requested RenderPass out of range: " + renderPass);
+			// 	return null;
+			// }
 			Debug.Log(nameof(GetRenderTextureForRenderPass) + ": " + renderPass);
-			return rts[renderPass];
+			return target;
 		}
 
 		public new void SetMSAALevel(int level)
