@@ -160,7 +160,7 @@ namespace needle.weaver.webxr
 			Debug.Log("GetMirrorViewBlitDesc " + mirrorBlitDesc.blitParamsCount);
 #endif
 			outDesc = CurrentBehaviour.GetMirrorViewBlitDesc();
-			return true;
+			return outDesc.blitParamsCount > 0;
 		}
 
 		private void SetFocusPlane_Injected(

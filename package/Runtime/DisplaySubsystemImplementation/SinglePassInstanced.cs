@@ -8,6 +8,7 @@ namespace needle.weaver.webxr
 	public class SinglePassInstanced : IDisplaySubsystemBehaviour
 	{
 		private RenderTexture target;
+		private Camera main;
 		private Camera left, right;
 		private readonly List<RenderTexture> camTargets = new List<RenderTexture>();
 
@@ -65,19 +66,23 @@ namespace needle.weaver.webxr
 				}
 			}
 
-			static void EnsureCamera(ref Camera cam, string name, float x, StereoTargetEyeMask targetEye, RenderTexture tex, Matrix4x4 projection)
+			void EnsureCamera(ref Camera cam, string name, float x, StereoTargetEyeMask targetEye, RenderTexture tex, Matrix4x4 projection)
 			{
 				if (!cam)
 				{
-					var main = Camera.main;
-					if (!main) main = Object.FindObjectOfType<Camera>();
-					if (!main)
+					if(!main)
 					{
+						main = Camera.main;
+						if (!main) main = Object.FindObjectOfType<Camera>();
+						if (!main)
+						{
 #if DEVELOPMENT_BUILD
-						Debug.Log("No camera found");
+							Debug.Log("No camera found");
 #endif
-						return;
+							return;
+						}
 					}
+					
 					var go = new GameObject(name);
 					go.transform.SetParent(main.transform, false);
 					go.transform.localPosition = new Vector3(x, 0, 0);
@@ -93,7 +98,12 @@ namespace needle.weaver.webxr
 #if DEVELOPMENT_BUILD
 				Debug.Log(projection);
 #endif
-				cam.projectionMatrix = projection == Matrix4x4.zero ? Matrix4x4.identity : projection;
+				
+				// if (projection == Matrix4x4.zero)
+				// {
+				// 	projection = main ? main.projectionMatrix : Matrix4x4.identity;
+				// }
+				// cam.projectionMatrix = projection;
 				cam.targetTexture = tex;
 			}
 
@@ -149,7 +159,7 @@ namespace needle.weaver.webxr
 		{
 			EnsureTextures();
 			var blitCount = 2;
-			// if (provider == null) blitCount = 0;
+			if (provider == null) blitCount = 0;
 			// else if (provider.ProjectionLeft == Matrix4x4.zero || provider.ProjectionRight == Matrix4x4.zero) 
 			// 	blitCount = 0;
 			// else if (!left || !right) blitCount = 0;
