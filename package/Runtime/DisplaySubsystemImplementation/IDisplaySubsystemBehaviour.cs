@@ -30,17 +30,17 @@ namespace needle.weaver.webxr
 
 		
 		//  XRMirrorViewBlitDesc
-		void GetBlitParameter(
+		void OnGetBlitParameter(
 			int blitParameterIndex,
 			out XRDisplaySubsystem.XRBlitParams blitParameter);
 
 		// render pass
-		void GetRenderParameter(
+		void OnGetRenderParameter(
 			ref XRDisplaySubsystem.XRRenderPass pass, 
 			Camera camera, 
 			int renderParameterIndex, 
 			out XRDisplaySubsystem.XRRenderParameter renderParameter);
 
-		int GetRenderParameterCount(ref XRDisplaySubsystem.XRRenderPass pass);
+		int OnGetRenderParameterCount(ref XRDisplaySubsystem.XRRenderPass pass);
 	}
 }

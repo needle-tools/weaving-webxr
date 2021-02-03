@@ -4,6 +4,7 @@ using needle.weaver.webxr.Utils;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR;
+using Object = UnityEngine.Object;
 
 // ReSharper disable UnusedMember.Global
 
@@ -22,6 +23,7 @@ namespace needle.weaver.webxr
 		public void OnStart()
 		{
 			Debug.Log("Started display subsystem");
+			EnsureDisplayBehaviour();
 		}
 
 		public void OnStop()
@@ -33,53 +35,59 @@ namespace needle.weaver.webxr
 		}
 
 		private static IDisplaySubsystemBehaviour _behaviour;
-
 		internal static IDisplaySubsystemBehaviour Behaviour
 		{
 			get
 			{
-				if (_behaviour == null)
-				{
-					_behaviour = new SinglePassInstanced();
-					_behaviour.OnAttach();
-				}
+				Instance.EnsureDisplayBehaviour();
 				return _behaviour;
 			}
 		}
+
+		private void EnsureDisplayBehaviour()
+		{
+			if (_behaviour == null)
+			{
+				_behaviour = new SinglePassInstanced();
+				_behaviour.OnAttach();
+				renderPassCount = _behaviour.GetRenderPassCount();
+			}
+		}
+
+		private static int renderPassCount;
+
 		
 		// ------------------------ patched methods
 
-		public new bool displayOpaque => Behaviour.displayOpaque;
+		public new bool displayOpaque => Behaviour?.displayOpaque ?? true;
 
-		public new float scaleOfAllViewports => Behaviour.scaleOfAllViewports;
+		public new float scaleOfAllViewports => Behaviour?.scaleOfAllViewports ?? 1;
 
-		public new float scaleOfAllRenderTargets => Behaviour.scaleOfAllRenderTargets;
+		public new float scaleOfAllRenderTargets => Behaviour?.scaleOfAllRenderTargets ?? 1;
 
 
-		public new TextureLayout textureLayout
-		{
-			get => Behaviour.textureLayout;
-			set => Debug.Log("Todo: check if the current behaviour is supports " + value + " and if not switch it");
-		}
+		public new TextureLayout textureLayout => Behaviour?.textureLayout ?? 0;
 
 		public new TextureLayout supportedTextureLayouts
 		{
 			get
 			{
 				Debug.Log("Todo: loop through list of interface implementation instances and get all supported layouts");
-				return Behaviour.textureLayout;
+				return Behaviour?.textureLayout ?? 0;
 			}
 		}
 
-		internal int renderPassCount;
-		public new int GetRenderPassCount() => renderPassCount;// Behaviour.GetRenderPassCount();
+		public new int GetRenderPassCount() => renderPassCount;
 
 		private bool Internal_TryGetRenderPass(
 			int renderPassIndex,
 			out XRRenderPass renderPass)
 		{
 			Debug.Log("Get render pass index " + renderPassIndex);
-			return Behaviour.TryGetRenderPass(renderPassIndex, out renderPass);
+			if (Behaviour != null)
+				return Behaviour.TryGetRenderPass(renderPassIndex, out renderPass);
+			renderPass = new XRRenderPass();
+			return false;
 		}
 
 		private bool Internal_TryGetCullingParams(
@@ -88,19 +96,24 @@ namespace needle.weaver.webxr
 			out ScriptableCullingParameters scriptableCullingParameters)
 		{
 			Debug.Log("Get culling index " + cullingPassIndex);
-			return Behaviour.TryGetCullingParams(camera, cullingPassIndex, out scriptableCullingParameters);
+			if (Behaviour != null)
+			{
+				return Behaviour.TryGetCullingParams(camera, cullingPassIndex, out scriptableCullingParameters);
+			}
+			scriptableCullingParameters = new ScriptableCullingParameters();
+			return false;
 		}
 		
 		
 		public new bool GetMirrorViewBlitDesc(
 			RenderTexture mirrorRt,
-			out XRMirrorViewBlitDesc outDesc,
+			out XRDisplaySubsystem.XRMirrorViewBlitDesc outDesc,
 			int mode)
 		{
+			Debug.Log("GetMirrorViewBlitDesc");
 			outDesc = new XRMirrorViewBlitDesc();
 			outDesc.blitParamsCount = 2;
 			return true;
-			// return Behaviour.GetMirrorViewBlitDesc(mirrorRt, out outDesc, mode);
 		}
 
 		private void SetFocusPlane_Injected(
@@ -108,24 +121,24 @@ namespace needle.weaver.webxr
 			ref Vector3 normal,
 			ref Vector3 velocity)
 		{
-			Behaviour.SetFocusPlane_Injected(ref point, ref normal, ref velocity);
+			Behaviour?.SetFocusPlane_Injected(ref point, ref normal, ref velocity);
 		}
 
 		public new void SetPreferredMirrorBlitMode(int blitMode)
 		{
 			Debug.Log(nameof(SetPreferredMirrorBlitMode) + ": " + blitMode);
-			Behaviour.SetPreferredMirrorBlitMode(blitMode);
+			Behaviour?.SetPreferredMirrorBlitMode(blitMode);
 		}
 
 		public new RenderTexture GetRenderTextureForRenderPass(int renderPass)
 		{
 			Debug.Log(nameof(GetRenderTextureForRenderPass) + ": " + renderPass);
-			return Behaviour.GetRenderTextureForRenderPass(renderPass);
+			return Behaviour?.GetRenderTextureForRenderPass(renderPass);
 		}
 
 		public new void SetMSAALevel(int level)
 		{
-			Behaviour.SetMSAALevel(level);
+			
 		}
 	}
 }

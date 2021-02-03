@@ -48,11 +48,11 @@ namespace needle.weaver.webxr
 			});
 		}
 
-		private static WebXRSubsystem subsystem;
+		private static WebXRInputManager subsystem;
 
 		private static void OnToggle()
 		{
-			if (!subsystem) subsystem = FindObjectOfType<WebXRSubsystem>();
+			if (!subsystem) subsystem = FindObjectOfType<WebXRInputManager>();
 			if (!subsystem) return;
 			subsystem.enabled = !subsystem.enabled;
 		}

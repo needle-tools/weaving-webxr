@@ -63,6 +63,7 @@ namespace needle.weaver.webxr
 
 		public void OnAttach()
 		{
+			EnsureTextures();
 		}
 
 		public void OnDetach()
@@ -118,7 +119,7 @@ namespace needle.weaver.webxr
 		public float scaleOfAllViewports => 1;
 		public bool displayOpaque => true;
 
-		public void GetBlitParameter(int blitParameterIndex,
+		public void OnGetBlitParameter(int blitParameterIndex,
 			out XRDisplaySubsystem.XRBlitParams blitParameter)
 		{
 			var bp = new XRDisplaySubsystem.XRBlitParams();
@@ -130,7 +131,7 @@ namespace needle.weaver.webxr
 			blitParameter = bp;
 		}
 
-		public void GetRenderParameter(ref XRDisplaySubsystem.XRRenderPass pass, Camera camera, int renderParameterIndex,
+		public void OnGetRenderParameter(ref XRDisplaySubsystem.XRRenderPass pass, Camera camera, int renderParameterIndex,
 			out XRDisplaySubsystem.XRRenderParameter renderParameter)
 		{
 			renderParameter = new XRDisplaySubsystem.XRRenderParameter
@@ -142,6 +143,6 @@ namespace needle.weaver.webxr
 			};
 		}
 
-		public int GetRenderParameterCount(ref XRDisplaySubsystem.XRRenderPass pass) => 1;
+		public int OnGetRenderParameterCount(ref XRDisplaySubsystem.XRRenderPass pass) => 1;
 	}
 }

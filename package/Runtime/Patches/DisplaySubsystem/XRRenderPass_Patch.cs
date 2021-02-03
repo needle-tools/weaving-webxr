@@ -15,12 +15,12 @@ namespace needle.weaver.webxr
 		{
 			Debug.Log("Get Render parameter " + renderParameterIndex);
 			renderParameter = new XRDisplaySubsystem.XRRenderParameter();
-			XRDisplaySubsystem_Patch.Behaviour.GetRenderParameter(ref _unity_self, camera, renderParameterIndex, out renderParameter);
+			XRDisplaySubsystem_Patch.Behaviour.OnGetRenderParameter(ref _unity_self, camera, renderParameterIndex, out renderParameter);
 		}
 
 		private static int GetRenderParameterCount_Injected(ref XRDisplaySubsystem.XRRenderPass _unity_self)
 		{
-			return XRDisplaySubsystem_Patch.Behaviour.GetRenderParameterCount(ref _unity_self);
+			return XRDisplaySubsystem_Patch.Behaviour.OnGetRenderParameterCount(ref _unity_self);
 		}
 	}
 
@@ -33,7 +33,7 @@ namespace needle.weaver.webxr
 			out XRDisplaySubsystem.XRBlitParams blitParameter)
 		{
 			Debug.Log("Get Blit parameter " + blitParameterIndex);
-			XRDisplaySubsystem_Patch.Behaviour.GetBlitParameter(blitParameterIndex, out blitParameter);
+			XRDisplaySubsystem_Patch.Behaviour.OnGetBlitParameter(blitParameterIndex, out blitParameter);
 		}
 		
 	}

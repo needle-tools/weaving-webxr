@@ -2,7 +2,7 @@
 
 namespace needle.weaver.webxr
 {
-	public class WebXRSubsystem : SubsystemLifecycleManager<XRInputSubsystem, XRInputSubsystemDescriptor>
+	public class WebXRInputManager : SubsystemLifecycleManager<XRInputSubsystem, XRInputSubsystemDescriptor>
 	{
 		protected override XRInputSubsystem GetActiveSubsystemInstance()
 		{
