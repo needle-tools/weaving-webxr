@@ -46,7 +46,7 @@ namespace needle.weaver.webxr
 				RenderTexture CreateNewTexture(RenderTexture prev, string name)
 				{
 					if (prev) prev.Release();
-					var t = new RenderTexture(expectedWidth, expectedHeight, 0);
+					var t = new RenderTexture(expectedWidth, expectedHeight, 24);
 					t.name = name;
 					t.Create();
 #if DEVELOPMENT_BUILD
