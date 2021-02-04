@@ -13,7 +13,7 @@ namespace needle.weaver.webxr.Utils
 
 #if !UNITY_EDITOR && UNITY_WEBGL
 			var descriptor = new TDescriptor();
-			var desc = ManagedDescriptor.CreateAndRegister(id, subsystem, descriptor);
+			var desc = ManagedBinding.CreateAndRegister(id, subsystem, descriptor);
 
 			var idPtr = typeof(IntegratedSubsystemDescriptor).GetField("m_Ptr", (BindingFlags) ~0);
 			if (idPtr != null)

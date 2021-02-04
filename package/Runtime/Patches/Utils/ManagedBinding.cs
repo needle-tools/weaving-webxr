@@ -5,11 +5,11 @@ using UnityEngine;
 
 namespace needle.weaver.webxr.Utils
 {
-	public class ManagedDescriptor : IDisposable
+	public class ManagedBinding : IDisposable
 	{
-		internal static readonly List<ManagedDescriptor> Instances = new List<ManagedDescriptor>();
+		internal static readonly List<ManagedBinding> Instances = new List<ManagedBinding>();
 
-		public static bool TryGetInstance(string id, out ManagedDescriptor instance)
+		public static bool TryGetInstance(string id, out ManagedBinding instance)
 		{
 			foreach (var inst in Instances)
 			{
@@ -24,9 +24,9 @@ namespace needle.weaver.webxr.Utils
 			return false;
 		}
 
-		public static ManagedDescriptor CreateAndRegister(string id, ISubsystem instance, ISubsystemDescriptor descriptor)
+		public static ManagedBinding CreateAndRegister(string id, ISubsystem instance, ISubsystemDescriptor descriptor)
 		{
-			var handle = new ManagedDescriptor(id, instance, descriptor);
+			var handle = new ManagedBinding(id, instance, descriptor);
 			Instances.Add(handle);
 #if DEVELOPMENT_BUILD
 			Debug.Log("Register managed instance " + handle);
@@ -57,7 +57,7 @@ namespace needle.weaver.webxr.Utils
 			return false;
 		}
 
-		private ManagedDescriptor(string id, ISubsystem subsystem, ISubsystemDescriptor descriptor)
+		private ManagedBinding(string id, ISubsystem subsystem, ISubsystemDescriptor descriptor)
 		{
 			Id = id;
 			IdHandle = GCHandle.Alloc(id, GCHandleType.Pinned);

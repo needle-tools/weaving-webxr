@@ -13,7 +13,7 @@ namespace needle.weaver.webxr
 		{
 			Debug.Log("Search descriptor binding: " + descriptorPtr);
 			
-			foreach (var man in ManagedDescriptor.Instances)
+			foreach (var man in ManagedBinding.Instances)
 			{
 				if (man == null) continue;
 				if (man.DescriptorPointer == descriptorPtr)

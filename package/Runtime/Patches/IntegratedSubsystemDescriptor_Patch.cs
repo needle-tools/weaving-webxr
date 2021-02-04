@@ -26,9 +26,9 @@ namespace needle.weaver.webxr
 		{
 			get
 			{
-				for (var index = ManagedDescriptor.Instances.Count - 1; index >= 0; index--)
+				for (var index = ManagedBinding.Instances.Count - 1; index >= 0; index--)
 				{
-					var di = ManagedDescriptor.Instances[index];
+					var di = ManagedBinding.Instances[index];
 					if (di.TryGetDescriptorId(m_Ptr, out var _id))
 						return _id;
 				}
@@ -38,7 +38,7 @@ namespace needle.weaver.webxr
 				if (!failedList.Contains(m_Ptr))
 				{
 					failedList.Add(m_Ptr);
-					Debug.LogError("Could not find descriptor for " + m_Ptr + ". Available:\n" + string.Join("\n", ManagedDescriptor.Instances));
+					Debug.LogError("Could not find descriptor for " + m_Ptr + ". Available:\n" + string.Join("\n", ManagedBinding.Instances));
 				}
 #endif
 				
