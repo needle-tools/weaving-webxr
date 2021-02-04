@@ -12,7 +12,7 @@ using UnityEngine.XR;
 namespace needle.weaver.webxr
 {
 	[NeedlePatch(typeof(XRInputSubsystem))]
-	internal class XRInputSubsystem_Patch : XRInputSubsystem, ISubsystemLifecycleCallbacks
+	public class XRInputSubsystem_Patch : XRInputSubsystem, ISubsystemLifecycleCallbacks
 	{
 		private static readonly Lazy<XRInputSubsystem_Patch> _instance = new Lazy<XRInputSubsystem_Patch>( () => IntegratedSubsystemsHelper.CreateInstance<XRInputSubsystem_Patch, XRInputSubsystemDescriptor>( "com.needle.webxr.input"));
 		
@@ -24,7 +24,6 @@ namespace needle.weaver.webxr
 
 		public void OnStart()
 		{
-			Debug.Log("OnStart called");
 		}
 
 		public void OnStop()

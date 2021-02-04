@@ -9,7 +9,7 @@ using UnityEngine;
 namespace needle.weaver.webxr
 {
 	[NeedlePatch(typeof(IntegratedSubsystemDescriptor))]
-	public class IntegratedSubsystemDescriptor_Patch
+	public abstract class IntegratedSubsystemDescriptor_Patch
 	{
 #pragma warning disable 649
 		private IntPtr m_Ptr;
@@ -20,6 +20,7 @@ namespace needle.weaver.webxr
 #if DEVELOPMENT_BUILD
 		private static readonly List<IntPtr> failedList = new List<IntPtr>();
 #endif
+		
 
 		public string id
 		{
@@ -37,10 +38,11 @@ namespace needle.weaver.webxr
 				if (!failedList.Contains(m_Ptr))
 				{
 					failedList.Add(m_Ptr);
-					Debug.LogWarning("Could not find descriptor for " + m_Ptr + ". Available:\n" + string.Join("\n", ManagedDescriptor.Instances));
+					Debug.LogError("Could not find descriptor for " + m_Ptr + ". Available:\n" + string.Join("\n", ManagedDescriptor.Instances));
 				}
 #endif
-
+				
+				// do we need this? this is a fallback although it's an external call so it is patched and will do nothing
 				if (getBindingMethod == null)
 				{
 #if UNITY_2020_2_OR_NEWER

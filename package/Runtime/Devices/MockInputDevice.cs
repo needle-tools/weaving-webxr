@@ -65,7 +65,9 @@ namespace needle.weaver.webxr
 				xrNodeUsage = usg.GetXRNodeUsage(getValue, Node);
 			if (xrNodeUsage == null)
 			{
-				Debug.LogWarning("Could not derive XRNode usage from " + usage.name + ". Please provide explicitly");
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+				if(DebugLog) Debug.LogWarning("Could not derive XRNode usage from " + usage.name + ". Please provide explicitly");
+#endif
 				return;
 			}
 

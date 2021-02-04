@@ -64,8 +64,18 @@ namespace needle.weaver.webxr
 					{
 						if(desc != null)
 						{
-							Debug.Log("Registered Descriptor: " + desc + ", id=" + desc?.id);
+							Debug.Log("Registered Descriptor: " + desc + ", id=" + desc.id);
 							list.Add(desc);
+							// check if actually added:
+							var inList = new List<IntegratedSubsystemDescriptor>();
+							SubsystemManager.GetSubsystemDescriptors(inList);
+							if (!inList.Contains(desc))
+							{
+								Debug.LogError("Failed adding subsystem descriptor");
+								return false;
+							}
+
+							Debug.Log("Successfully added " + desc.id);
 							return true;
 						}
 						Debug.LogError("Descriptor is null");

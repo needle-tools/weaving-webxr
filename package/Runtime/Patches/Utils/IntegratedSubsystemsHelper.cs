@@ -13,12 +13,12 @@ namespace needle.weaver.webxr.Utils
 
 #if !UNITY_EDITOR && UNITY_WEBGL
 			var descriptor = new TDescriptor();
-			var desc = ManagedDescriptor.CreateAndRegister(id, subsystem);
+			var desc = ManagedDescriptor.CreateAndRegister(id, subsystem, descriptor);
 
 			var idPtr = typeof(IntegratedSubsystemDescriptor).GetField("m_Ptr", (BindingFlags) ~0);
 			if (idPtr != null)
 			{
-				idPtr.SetValue(descriptor, desc.IdPointer);
+				idPtr.SetValue(descriptor, desc.DescriptorPointer);
 			}
 			else Debug.LogError("Could not set descriptor id string pointer " + subsystem);
 
