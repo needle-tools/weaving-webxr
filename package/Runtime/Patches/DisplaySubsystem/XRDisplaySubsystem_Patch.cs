@@ -5,40 +5,38 @@ using needle.weaver.webxr.Utils;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR;
-using Object = UnityEngine.Object;
 
 // ReSharper disable UnusedMember.Global
-
 namespace needle.weaver.webxr
 {
 	[NeedlePatch(typeof(XRDisplaySubsystem))]
 	public class XRDisplaySubsystem_Patch : XRDisplaySubsystem, IDisplayDataProvider, ISubsystemLifecycleCallbacks
 	{
 		public static string Id => "com.needle.webxr.display";
-
 		private static readonly Lazy<XRDisplaySubsystem_Patch> _instance = new Lazy<XRDisplaySubsystem_Patch>(() =>
 			IntegratedSubsystemsHelper.CreateInstance<XRDisplaySubsystem_Patch, XRDisplaySubsystemDescriptor>(Id));
-
 		public static XRDisplaySubsystem_Patch Instance => _instance.Value;
 
-
+		public static bool DebugLog;
 		public Matrix4x4 ProjectionLeft { get; set; }
 		public Matrix4x4 ProjectionRight { get; set; }
 
 		public void OnStart()
 		{
-			Debug.Log("Started display subsystem");
-			AttachDisplayBehaviour<SinglePassInstanced>();
+			isRunning = true;
+			AttachDisplayBehaviour<RenderVR>();
 		}
 
 		public void OnStop()
 		{
+			isRunning = false;
 			CurrentBehaviour?.OnDetach(this);
 			CurrentBehaviour = null;
 		}
 
 		public void OnDestroy()
 		{
+			isRunning = false;
 			if (availableBehaviours != null)
 			{
 				foreach (var av in availableBehaviours)
@@ -52,6 +50,9 @@ namespace needle.weaver.webxr
 
 			CurrentBehaviour = null;
 		}
+		
+		private bool isRunning;
+		public bool GetIsRunning() => isRunning;
 
 		internal static IDisplaySubsystemBehaviour CurrentBehaviour { get; private set; }
 
@@ -82,7 +83,7 @@ namespace needle.weaver.webxr
 
 			if (CurrentBehaviour == null)
 			{
-				CurrentBehaviour = new SinglePassInstanced();
+				CurrentBehaviour = new RenderVR();
 				availableBehaviours.Add(CurrentBehaviour);
 			}
 
@@ -105,30 +106,27 @@ namespace needle.weaver.webxr
 		public new float scaleOfAllRenderTargets => CurrentBehaviour?.scaleOfAllRenderTargets ?? 1;
 
 
-		public new TextureLayout textureLayout => CurrentBehaviour?.textureLayout ?? 0;
+		public new TextureLayout textureLayout => isRunning ? CurrentBehaviour?.textureLayout ?? 0 : 0;
 
 		public new TextureLayout supportedTextureLayouts
 		{
 			get
 			{
 				TextureLayout layout = 0;
+				if (!isRunning) return layout;
 				if (availableBehaviours == null) return (TextureLayout) ~0;
 				foreach (var beh in availableBehaviours) layout |= beh.textureLayout;
 				return layout;
 			}
 		}
 
-		public new int GetRenderPassCount() => renderPassCount;
+		public new int GetRenderPassCount() => isRunning ? renderPassCount : 0;
 
 		private bool Internal_TryGetRenderPass(
 			int renderPassIndex,
 			out XRRenderPass renderPass)
 		{
-#if DEVELOPMENT_BUILD
-			Debug.Log("Get render pass index " + renderPassIndex);
-#endif
-			if (CurrentBehaviour != null)
-				return CurrentBehaviour.TryGetRenderPass(renderPassIndex, out renderPass);
+			if (CurrentBehaviour != null) return CurrentBehaviour.TryGetRenderPass(renderPassIndex, out renderPass);
 			renderPass = new XRRenderPass();
 			return false;
 		}
@@ -138,9 +136,6 @@ namespace needle.weaver.webxr
 			int cullingPassIndex,
 			out ScriptableCullingParameters scriptableCullingParameters)
 		{
-#if DEVELOPMENT_BUILD
-			Debug.Log("Get culling index " + cullingPassIndex);
-#endif
 			if (CurrentBehaviour != null)
 			{
 				return CurrentBehaviour.TryGetCullingParams(camera, cullingPassIndex, out scriptableCullingParameters);
@@ -156,9 +151,6 @@ namespace needle.weaver.webxr
 			out XRMirrorViewBlitDesc outDesc,
 			int mode)
 		{
-#if DEVELOPMENT_BUILD
-			Debug.Log("GetMirrorViewBlitDesc " + mirrorBlitDesc.blitParamsCount);
-#endif
 			outDesc = CurrentBehaviour.GetMirrorViewBlitDesc();
 			return outDesc.blitParamsCount > 0;
 		}
@@ -173,17 +165,11 @@ namespace needle.weaver.webxr
 
 		public new void SetPreferredMirrorBlitMode(int blitMode)
 		{
-#if DEVELOPMENT_BUILD
-			Debug.Log(nameof(SetPreferredMirrorBlitMode) + ": " + blitMode);
-#endif
 			CurrentBehaviour?.SetPreferredMirrorBlitMode(blitMode);
 		}
 
 		public new RenderTexture GetRenderTextureForRenderPass(int renderPass)
 		{
-#if DEVELOPMENT_BUILD
-			Debug.Log(nameof(GetRenderTextureForRenderPass) + ": " + renderPass);
-#endif
 			return CurrentBehaviour?.GetRenderTextureForRenderPass(renderPass);
 		}
 

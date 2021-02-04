@@ -13,9 +13,6 @@ namespace needle.weaver.webxr
 			int renderParameterIndex,
 			out XRDisplaySubsystem.XRRenderParameter renderParameter)
 		{
-#if DEVELOPMENT_BUILD
-			Debug.Log("Get Render parameter " + renderParameterIndex);
-#endif
 			renderParameter = new XRDisplaySubsystem.XRRenderParameter();
 			XRDisplaySubsystem_Patch.CurrentBehaviour.OnGetRenderParameter(ref _unity_self, camera, renderParameterIndex, out renderParameter);
 		}
@@ -33,9 +30,6 @@ namespace needle.weaver.webxr
 			int blitParameterIndex,
 			out XRDisplaySubsystem.XRBlitParams blitParameter)
 		{
-#if DEVELOPMENT_BUILD
-			Debug.Log("Get Blit parameter " + blitParameterIndex);
-#endif
 			XRDisplaySubsystem_Patch.CurrentBehaviour.OnGetBlitParameter(blitParameterIndex, out blitParameter);
 		}
 		

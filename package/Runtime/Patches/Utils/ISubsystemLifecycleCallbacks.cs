@@ -5,5 +5,6 @@
 		void OnStart();
 		void OnStop();
 		void OnDestroy();
+		bool GetIsRunning();
 	}
 }

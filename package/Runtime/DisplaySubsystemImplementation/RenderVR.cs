@@ -5,7 +5,7 @@ using UnityEngine.XR;
 
 namespace needle.weaver.webxr
 {
-	public class SinglePassInstanced : IDisplaySubsystemBehaviour
+	public class RenderVR : IDisplaySubsystemBehaviour
 	{
 		private RenderTexture target;
 		private Camera main;
@@ -95,10 +95,6 @@ namespace needle.weaver.webxr
 #endif
 				}
 
-#if DEVELOPMENT_BUILD
-				Debug.Log(projection);
-#endif
-
 				// if (projection == Matrix4x4.zero)
 				// {
 				// 	projection = main ? main.projectionMatrix : Matrix4x4.identity;
@@ -106,6 +102,7 @@ namespace needle.weaver.webxr
 				if (projection != Matrix4x4.zero)
 					cam.projectionMatrix = projection;
 				cam.targetTexture = tex;
+				cam.enabled = true;
 			}
 
 			if (provider == null) return;
@@ -125,6 +122,8 @@ namespace needle.weaver.webxr
 		{
 			if (prov != provider) return;
 			provider = null;
+			if (left) left.enabled = false;
+			if (right) right.enabled = false;
 		}
 
 		public void Dispose()
@@ -165,9 +164,9 @@ namespace needle.weaver.webxr
 			// 	blitCount = 0;
 			// else if (!left || !right) blitCount = 0;
 
-#if DEVELOPMENT_BUILD
-			Debug.Log("Blits: " + blitCount);
-#endif
+// #if DEVELOPMENT_BUILD
+// 			Debug.Log("Blits: " + blitCount);
+// #endif
 			var outDesc = new XRDisplaySubsystem.XRMirrorViewBlitDesc {blitParamsCount = blitCount};
 			return outDesc;
 		}
@@ -179,9 +178,9 @@ namespace needle.weaver.webxr
 
 		public bool TryGetRenderPass(int renderPassIndex, out XRDisplaySubsystem.XRRenderPass renderPass)
 		{
-#if DEVELOPMENT_BUILD
-			Debug.Log("Get render pass index " + renderPassIndex);
-#endif
+// #if DEVELOPMENT_BUILD
+// 			Debug.Log("Get render pass index " + renderPassIndex);
+// #endif
 			renderPass = new XRDisplaySubsystem.XRRenderPass
 			{
 				renderTarget = RenderPassTexture,

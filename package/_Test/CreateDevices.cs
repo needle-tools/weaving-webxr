@@ -11,7 +11,7 @@ namespace needle.weaver.webxr
 		{
 			if (Application.isEditor) return;
 			
-			SubsystemAPI.RegisterInputDevice(MockDeviceBuilder.CreateHeadset(
+			InputSubsystemAPI.Connect(MockDeviceBuilder.CreateHeadset(
 					() => true,
 					() => Vector3.LerpUnclamped(new Vector3(0,0,-.5f), Vector3.up * .2f, Mathf.Sin(Time.time)),
 					() => _rotation
@@ -28,15 +28,15 @@ namespace needle.weaver.webxr
 			rightController.AddFeature(CommonUsages.secondaryButton, () => Random.value > .5);
 			rightController.AddFeature(CommonUsages.grip, () => Random.value);
 			rightController.AddFeature(CommonUsages.gripButton, () => Random.value > .5f);
-			SubsystemAPI.RegisterInputDevice(rightController);
+			InputSubsystemAPI.Connect(rightController);
 			
 			var leftController = MockDeviceBuilder.CreateLeftController(
 				() => true,
 				() => Vector3.LerpUnclamped(Vector3.zero, Vector3.right * .5f, Mathf.Sin(Time.time * 5f)),
 				() => Quaternion.identity);
-			SubsystemAPI.RegisterInputDevice(leftController);
+			InputSubsystemAPI.Connect(leftController);
 			
-			SubsystemAPI.SetSupportedTrackingMode(TrackingOriginModeFlags.Device | TrackingOriginModeFlags.Floor);
+			InputSubsystemAPI.SetSupportedTrackingMode(TrackingOriginModeFlags.Device | TrackingOriginModeFlags.Floor);
 		}
 
 		private void Update()

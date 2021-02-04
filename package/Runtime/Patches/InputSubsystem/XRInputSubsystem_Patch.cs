@@ -14,7 +14,8 @@ namespace needle.weaver.webxr
 	[NeedlePatch(typeof(XRInputSubsystem))]
 	public class XRInputSubsystem_Patch : XRInputSubsystem, ISubsystemLifecycleCallbacks
 	{
-		private static readonly Lazy<XRInputSubsystem_Patch> _instance = new Lazy<XRInputSubsystem_Patch>( () => IntegratedSubsystemsHelper.CreateInstance<XRInputSubsystem_Patch, XRInputSubsystemDescriptor>( "com.needle.webxr.input"));
+		public static string Id => "com.needle.webxr.input";
+		private static readonly Lazy<XRInputSubsystem_Patch> _instance = new Lazy<XRInputSubsystem_Patch>( () => IntegratedSubsystemsHelper.CreateInstance<XRInputSubsystem_Patch, XRInputSubsystemDescriptor>(Id));
 		
 		public static XRInputSubsystem_Patch Instance => _instance.Value;
 		internal static readonly List<MockInputDevice> InputDevices = new List<MockInputDevice>();
@@ -22,20 +23,25 @@ namespace needle.weaver.webxr
 		internal static TrackingOriginModeFlags SupportedTrackingOriginMode = TrackingOriginModeFlags.Floor | TrackingOriginModeFlags.Device;
 		private static TrackingOriginModeFlags currentTrackingMode = TrackingOriginModeFlags.Device;
 
+		private bool isRunning;
+		
 		public void OnStart()
 		{
+			isRunning = true;
 		}
 
 		public void OnStop()
 		{
-			
+			isRunning = false;
 		}
 
 		public void OnDestroy()
 		{
-			
+			isRunning = false;
 		}
-		
+
+		public bool GetIsRunning() => isRunning;
+
 		// ----------------------- patched methods:
 		
 		

@@ -6,7 +6,7 @@ using UnityEngine.SubsystemsImplementation;
 
 namespace needle.weaver.webxr
 {
-	public static class AddSubsystem
+	public static class RegisterIntegratedSubsystems
 	{
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
 		private static void Init()
