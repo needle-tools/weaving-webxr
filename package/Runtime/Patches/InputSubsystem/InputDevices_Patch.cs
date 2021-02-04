@@ -43,7 +43,7 @@ namespace needle.weaver.webxr
 					}
 				}
 
-				Debug.LogWarning("Could not find device at " + node);
+				// Debug.LogWarning("Could not find device at " + node);
 			}
 			
 			return new InputDevice();

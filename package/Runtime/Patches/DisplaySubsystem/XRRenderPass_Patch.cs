@@ -14,12 +14,21 @@ namespace needle.weaver.webxr
 			out XRDisplaySubsystem.XRRenderParameter renderParameter)
 		{
 			renderParameter = new XRDisplaySubsystem.XRRenderParameter();
-			XRDisplaySubsystem_Patch.CurrentBehaviour.OnGetRenderParameter(ref _unity_self, camera, renderParameterIndex, out renderParameter);
+			if (XRDisplaySubsystem_Patch.CurrentBehaviour != null)
+			{
+				XRDisplaySubsystem_Patch.CurrentBehaviour.OnGetRenderParameter(ref _unity_self, camera, renderParameterIndex, out renderParameter);
+			}
+			// else
+			// {
+			// 	renderParameter.projection = camera.projectionMatrix;
+			// 	renderParameter.view = camera.worldToCameraMatrix;
+			// 	renderParameter.viewport = new Rect(0, 0, 1, 1);
+			// }
 		}
 
 		private static int GetRenderParameterCount_Injected(ref XRDisplaySubsystem.XRRenderPass _unity_self)
 		{
-			return XRDisplaySubsystem_Patch.CurrentBehaviour.OnGetRenderParameterCount(ref _unity_self);
+			return XRDisplaySubsystem_Patch.CurrentBehaviour?.OnGetRenderParameterCount(ref _unity_self) ?? 1;
 		}
 	}
 
@@ -30,8 +39,12 @@ namespace needle.weaver.webxr
 			int blitParameterIndex,
 			out XRDisplaySubsystem.XRBlitParams blitParameter)
 		{
-			XRDisplaySubsystem_Patch.CurrentBehaviour.OnGetBlitParameter(blitParameterIndex, out blitParameter);
+			if (XRDisplaySubsystem_Patch.CurrentBehaviour != null)
+				XRDisplaySubsystem_Patch.CurrentBehaviour.OnGetBlitParameter(blitParameterIndex, out blitParameter);
+			else
+			{
+				blitParameter = new XRDisplaySubsystem.XRBlitParams();
+			}
 		}
-		
 	}
 }

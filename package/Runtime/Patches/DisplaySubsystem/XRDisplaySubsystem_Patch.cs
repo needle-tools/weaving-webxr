@@ -13,25 +13,30 @@ namespace needle.weaver.webxr
 	public class XRDisplaySubsystem_Patch : XRDisplaySubsystem, IDisplayDataProvider, ISubsystemLifecycleCallbacks
 	{
 		public static string Id => "com.needle.webxr.display";
+
 		private static readonly Lazy<XRDisplaySubsystem_Patch> _instance = new Lazy<XRDisplaySubsystem_Patch>(() =>
 			IntegratedSubsystemsHelper.CreateInstance<XRDisplaySubsystem_Patch, XRDisplaySubsystemDescriptor>(Id));
+
 		public static XRDisplaySubsystem_Patch Instance => _instance.Value;
 
 		public static bool DebugLog;
 		public Matrix4x4 ProjectionLeft { get; set; }
 		public Matrix4x4 ProjectionRight { get; set; }
 
+
 		public void OnStart()
 		{
+			if (isRunning) return;
 			isRunning = true;
-			AttachDisplayBehaviour<RenderVR>();
 		}
 
 		public void OnStop()
 		{
+			if (!isRunning) return;
 			isRunning = false;
-			CurrentBehaviour?.OnDetach(this);
-			CurrentBehaviour = null;
+			DetachDisplayBehaviour();
+			Debug.Log($"Stopped {this} - Behaviours:\n" + string.Join("\n", availableBehaviours) + "\n" + 
+			          "Any active? " + (CurrentBehaviour != null));
 		}
 
 		public void OnDestroy()
@@ -50,20 +55,18 @@ namespace needle.weaver.webxr
 
 			CurrentBehaviour = null;
 		}
-		
+
 		private bool isRunning;
 		public bool GetIsRunning() => isRunning;
 
 		internal static IDisplaySubsystemBehaviour CurrentBehaviour { get; private set; }
 
-		private static void AttachDisplayBehaviour<T>() where T : IDisplaySubsystemBehaviour, new()
+		public static void AttachDisplayBehaviour<T>() where T : IDisplaySubsystemBehaviour, new()
 		{
 			if (CurrentBehaviour != null)
-			{
-				if (CurrentBehaviour.GetType() == typeof(T)) return;
-
-				CurrentBehaviour.OnDetach(Instance);
-			}
+				if (CurrentBehaviour.GetType() == typeof(T))
+					return;
+			DetachDisplayBehaviour();
 
 			// try see if any behaviour is already registered
 			if (availableBehaviours != null)
@@ -71,10 +74,10 @@ namespace needle.weaver.webxr
 				foreach (var av in availableBehaviours)
 				{
 					if (av == null) continue;
-					if (av.GetType() == typeof(T))
+					if (av is T)
 					{
 						CurrentBehaviour = av;
-						CurrentBehaviour.OnAttach(Instance);
+						Debug.Log("Attached DisplayBehaviour " + CurrentBehaviour);
 					}
 				}
 			}
@@ -83,17 +86,24 @@ namespace needle.weaver.webxr
 
 			if (CurrentBehaviour == null)
 			{
-				CurrentBehaviour = new RenderVR();
+				CurrentBehaviour = new T();
 				availableBehaviours.Add(CurrentBehaviour);
+				Debug.Log("Attached DisplayBehaviour new instance of " + CurrentBehaviour);
 			}
 
 			CurrentBehaviour.OnAttach(Instance);
 			renderPassCount = CurrentBehaviour.GetRenderPassCount();
-			mirrorBlitDesc = CurrentBehaviour.GetMirrorViewBlitDesc();
+		}
+
+		public static void DetachDisplayBehaviour()
+		{
+			if (CurrentBehaviour != null)
+				Debug.Log("Detach DisplayBehaviour " + CurrentBehaviour);
+			CurrentBehaviour?.OnDetach(Instance);
+			CurrentBehaviour = null;
 		}
 
 		private static int renderPassCount;
-		private static XRMirrorViewBlitDesc mirrorBlitDesc;
 		private static List<IDisplaySubsystemBehaviour> availableBehaviours;
 
 
@@ -106,7 +116,7 @@ namespace needle.weaver.webxr
 		public new float scaleOfAllRenderTargets => CurrentBehaviour?.scaleOfAllRenderTargets ?? 1;
 
 
-		public new TextureLayout textureLayout => isRunning ? CurrentBehaviour?.textureLayout ?? 0 : 0;
+		public new TextureLayout textureLayout => isRunning ? CurrentBehaviour?.textureLayout ?? 0 : TextureLayout.SingleTexture2D;
 
 		public new TextureLayout supportedTextureLayouts
 		{
@@ -120,14 +130,24 @@ namespace needle.weaver.webxr
 			}
 		}
 
-		public new int GetRenderPassCount() => isRunning ? renderPassCount : 0;
+		public new int GetRenderPassCount() => isRunning && CurrentBehaviour != null ? renderPassCount : 0;
 
 		private bool Internal_TryGetRenderPass(
 			int renderPassIndex,
 			out XRRenderPass renderPass)
 		{
-			if (CurrentBehaviour != null) return CurrentBehaviour.TryGetRenderPass(renderPassIndex, out renderPass);
-			renderPass = new XRRenderPass();
+			if (CurrentBehaviour != null)
+			{
+				return CurrentBehaviour.TryGetRenderPass(renderPassIndex, out renderPass);
+			}
+
+			renderPass = new XRRenderPass
+			{
+				shouldFillOutDepth = true,
+				renderPassIndex = renderPassIndex,
+				cullingPassIndex = 0,
+				renderTargetDesc = new RenderTextureDescriptor(Screen.width, Screen.height)
+			};
 			return false;
 		}
 
@@ -141,8 +161,11 @@ namespace needle.weaver.webxr
 				return CurrentBehaviour.TryGetCullingParams(camera, cullingPassIndex, out scriptableCullingParameters);
 			}
 
-			scriptableCullingParameters = new ScriptableCullingParameters();
-			return false;
+			camera.TryGetCullingParameters(out scriptableCullingParameters);
+
+			// camera.ResetProjectionMatrix();
+			// scriptableCullingParameters = new ScriptableCullingParameters();
+			return true;
 		}
 
 
