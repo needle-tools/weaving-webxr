@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.InputSystem.XR;
 using UnityEngine.XR;
+using CommonUsages = UnityEngine.XR.CommonUsages;
 using Debug = UnityEngine.Debug;
+using InputDevice = UnityEngine.InputSystem.InputDevice;
 
 namespace needle.weaver.webxr
 {
@@ -35,16 +39,120 @@ namespace needle.weaver.webxr
 
 		private static ulong _idCounter = 0;
 
-		public MockInputDevice(string name, XRNode node)
+		public MockInputDevice(string name, XRNode node, string layoutName)
 		{
 			this.Id = _idCounter++;
 			this.Name = name;
 			this.Node = node;
 			Debug.Log("Created new MockDevice: " + name + ", id=" + Id);
+
+			
+#if UNITY_INPUT_SYSTEM
+			device = InputSystem.AddDevice(layoutName, name, null);
+			if(node == XRNode.LeftHand)
+				InputSystem.AddDeviceUsage(device, UnityEngine.InputSystem.CommonUsages.LeftHand);
+			else if (node == XRNode.RightHand)
+				InputSystem.AddDeviceUsage(device, UnityEngine.InputSystem.CommonUsages.RightHand);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+			Debug.Log(name + " usages:\n" + string.Join("\n", device.usages));
+#endif
+#endif
 		}
+
+
+		public void Connect()
+		{
+#if UNITY_INPUT_SYSTEM
+			InputSystem.EnableDevice(this.device);
+#endif
+			
+			if (XRInputSubsystem_Patch.InputDevices.Contains(this)) return;
+			XRInputSubsystem_Patch.InputDevices.Add(this);
+#if DEVELOPMENT_BUILD
+			Debug.Log("Registered input device " + this.Id + " - " + this.Node);
+#endif
+		}
+
+		public void Disconnect()
+		{
+#if UNITY_INPUT_SYSTEM
+			InputSystem.DisableDevice(this.device);
+#endif
+			
+			if (!XRInputSubsystem_Patch.InputDevices.Contains(this)) return;
+			XRInputSubsystem_Patch.InputDevices.Remove(this);
+#if DEVELOPMENT_BUILD
+			Debug.Log("Removed input device " + this.Id + " - " + this.Node);
+#endif
+		}
+
+#if UNITY_INPUT_SYSTEM
+		private readonly InputDevice device;
+		/// <summary>
+		/// cached controls, make sure to clear when changing features
+		/// </summary>
+		private List<(InputControl control, Delegate callback)> newInputSystemControls = null;
+#endif
+
+		/// <summary>
+		/// currently only necessary for NewInputSystem
+		/// </summary>
+		public void UpdateDevice()
+		{
+#if UNITY_INPUT_SYSTEM
+			using (StateEvent.From(device, out var ptr))
+			{
+				// check if controls have changed/never set
+				if (newInputSystemControls == null)
+				{
+					// collect controls from registered usages
+					newInputSystemControls = new List<(InputControl control, Delegate callback)>();
+					foreach (var kvp in _registry)
+					{
+						var name = kvp.Key.name;
+						var control = device.TryGetChildControl(name);
+						if (control == null)
+						{
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+							Debug.LogWarning("Control " + name + " does not exist in " + device.layout +
+							                 ". You may need to choose a different device layout or update your usages. This usage will be ignored in New Input System. Device: " +
+							                 device.name);
+#endif
+							continue;
+						}
+						newInputSystemControls.Add((control, kvp.Value));
+					}
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+					Debug.Log("Found " + newInputSystemControls.Count + " controls for " + this.Name +"\n" + string.Join("\n", newInputSystemControls));
+#endif
+				}
+
+				// loop input controls to update values
+				foreach (var (control, callback) in newInputSystemControls)
+				{
+					try
+					{
+						control.WriteValueFromObjectIntoEvent(ptr, callback.DynamicInvoke());
+					}
+					catch (Exception e)
+					{
+						Debug.LogException(e);
+					}
+				}
+
+				InputSystem.QueueEvent(ptr);
+				// InputSystem.Update();
+			}
+#endif
+		}
+
 
 		public void AddFeature<T>(InputFeatureUsage<T> usage, Func<T> getValue, XRNodeUsage xrNodeUsage = null)
 		{
+#if UNITY_INPUT_SYSTEM
+			newInputSystemControls.Clear();
+#endif
+
 			var usg = (InputFeatureUsage) usage;
 			if (!_registry.ContainsKey(usg))
 			{
@@ -61,12 +169,12 @@ namespace needle.weaver.webxr
 				_registry[usg] = getValue;
 			}
 
-			if(xrNodeUsage == null)
+			if (xrNodeUsage == null)
 				xrNodeUsage = usg.GetXRNodeUsage(getValue, Node);
 			if (xrNodeUsage == null)
 			{
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-				if(DebugLog) Debug.LogWarning("Could not derive XRNode usage from " + usage.name + ". Please provide explicitly");
+				if (DebugLog) Debug.LogWarning("Could not derive XRNode usage from " + usage.name + ". Please provide explicitly");
 #endif
 				return;
 			}
@@ -85,6 +193,10 @@ namespace needle.weaver.webxr
 		private readonly List<XRNodeUsage> _xrNodeUsages = new List<XRNodeUsage>();
 		private readonly Dictionary<InputFeatureUsage, Delegate> _registry = new Dictionary<InputFeatureUsage, Delegate>();
 
+		public IEnumerable<(string name, Delegate callback)> EnumerateUsages()
+		{
+			foreach (var usg in _registry) yield return (usg.Key.name, usg.Value);
+		}
 
 		public bool TryGetUsage<T>(string name, out T value)
 		{

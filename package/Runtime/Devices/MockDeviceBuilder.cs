@@ -1,5 +1,7 @@
 using System;
+using Unity.XR.OpenVR;
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 using UnityEngine.XR;
 
 namespace needle.weaver.webxr
@@ -8,7 +10,7 @@ namespace needle.weaver.webxr
 	{
 		public static MockInputDevice CreateHeadset(Func<bool> isTrackedCallback, Func<Vector3> positionCallback, Func<Quaternion> rotationCallback, Func<InputTrackingState> stateCallback = null, Func<Vector3> leftEyePositionCallback = null, Func<Quaternion> leftEyeRotationCallback = null, Func<Vector3> rightEyePositionCallback = null, Func<Quaternion> rightEyeRotationCallback = null)
 		{
-			var device = new MockInputDevice("<XRHMD>", XRNode.Head)
+			var device = new MockInputDevice("<XRHMD>", XRNode.Head, "XRHMD")
 			{
 				SerialNumber = "1.0.0",
 				Manufacturer = "Needle",
@@ -40,7 +42,7 @@ namespace needle.weaver.webxr
 		
 		private static MockInputDevice CreateController(XRNode node, Func<bool> isTrackedCallback, Func<Vector3> positionCallback, Func<Quaternion> rotationCallback, Func<InputTrackingState> stateCallback = null)
 		{
-			var device = new MockInputDevice("<XRController>", node)
+			var device = new MockInputDevice("<XRController>", node, nameof(XRController))
 			{
 				SerialNumber = "1.0.0",
 				Manufacturer = "Needle",

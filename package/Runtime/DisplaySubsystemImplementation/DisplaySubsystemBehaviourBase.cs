@@ -170,7 +170,7 @@ namespace needle.weaver.webxr
 		
 		public virtual bool TryGetRenderPass(int renderPassIndex, out XRDisplaySubsystem.XRRenderPass renderPass)
 		{
-			Debug.Log("get RenderPass " + renderPassIndex);
+			// Debug.Log("get RenderPass " + renderPassIndex);
 			renderPass = new XRDisplaySubsystem.XRRenderPass
 			{
 				renderTarget = RenderPassTexture,
