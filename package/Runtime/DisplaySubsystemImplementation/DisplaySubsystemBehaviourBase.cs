@@ -1,6 +1,8 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 using UnityEngine.Rendering;
 using UnityEngine.XR;
 
@@ -122,9 +124,20 @@ namespace needle.weaver.webxr
 			if (_originalProjectionMatrix != Matrix4x4.zero && MainCamera)
 			{
 				Debug.Log("Set main camera projection matrix\n" + _originalProjectionMatrix);
-				MainCamera.projectionMatrix = _originalProjectionMatrix;
-				MainCamera.ResetProjectionMatrix();
-				Debug.Log(MainCamera.fieldOfView);
+				var components = MainCamera.GetComponents<Behaviour>().Where(b => !(b is Camera)).ToArray();
+				var c = MainCamera.gameObject.AddComponent<ExitDisplaySubsystemHelper>();
+				c.Behaviours = components;
+				foreach (var comp in components)
+				{
+					Debug.Log("disable " + comp);
+					comp.enabled = false;
+				}
+				c.Callback = () =>
+				{
+					MainCamera.projectionMatrix = _originalProjectionMatrix;
+					MainCamera.fieldOfView = 60;
+					MainCamera.ResetProjectionMatrix();
+				};
 			}
 		}
 		
