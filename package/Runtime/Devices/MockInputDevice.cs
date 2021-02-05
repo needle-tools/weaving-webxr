@@ -64,6 +64,7 @@ namespace needle.weaver.webxr
 		{
 #if UNITY_INPUT_SYSTEM
 			InputSystem.EnableDevice(this.device);
+			device.MakeCurrent();
 #endif
 			
 			if (XRInputSubsystem_Patch.InputDevices.Contains(this)) return;
