@@ -12,13 +12,14 @@ namespace needle.weaver.webxr
 
 		private IEnumerator Start()
 		{
+			// TODO: one frame should be enough
 			yield return null;
 			yield return null;
 			yield return null;
 			if (Behaviours == null) yield break;
 			foreach (var c in Behaviours)
 			{
-				Debug.Log("enable " + c);
+				// Debug.Log("enable " + c);
 				c.enabled = true;
 			}
 			Callback?.Invoke();
