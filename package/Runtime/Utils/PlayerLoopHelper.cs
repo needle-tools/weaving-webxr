@@ -23,17 +23,17 @@ namespace Utils
 			PostLateUpdate,
 		}
 		
-		public static void AddUpdateCallback(object obj, PlayerLoopSystem.UpdateFunction callback, Stages stage, int index = int.MaxValue)
+		public static bool AddUpdateCallback(object obj, PlayerLoopSystem.UpdateFunction callback, Stages stage, int index = int.MaxValue)
 		{
-			AddUpdateCallback(obj.GetType(), callback, stage.ToString(), index);
+			return AddUpdateCallback(obj.GetType(), callback, stage.ToString(), index);
 		}
 
-		public static void AddUpdateCallback(Type type, PlayerLoopSystem.UpdateFunction callback, Stages stage, int index = int.MaxValue)
+		public static bool AddUpdateCallback(Type type, PlayerLoopSystem.UpdateFunction callback, Stages stage, int index = int.MaxValue)
 		{
-			AddUpdateCallback(type, callback, stage.ToString(), index);
+			return AddUpdateCallback(type, callback, stage.ToString(), index);
 		}
 
-		public static void AddUpdateCallback(Type type, PlayerLoopSystem.UpdateFunction callback, string stage, int index = int.MaxValue)
+		public static bool AddUpdateCallback(Type type, PlayerLoopSystem.UpdateFunction callback, string stage, int index = int.MaxValue)
 		{
 			var playerLoop = PlayerLoop.GetCurrentPlayerLoop();
 
@@ -68,6 +68,7 @@ namespace Utils
 			}
 
 			PlayerLoop.SetPlayerLoop(playerLoop);
+			return added;
 		}
 
 		public static void RemoveUpdateDelegate(object obj, PlayerLoopSystem.UpdateFunction callback)
