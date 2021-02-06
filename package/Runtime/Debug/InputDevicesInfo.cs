@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.XR;
@@ -10,9 +11,11 @@ namespace needle.weaver.webxr
 		private readonly List<XRNodeState> nodeStates = new List<XRNodeState>();
 		private FieldInfo inputDeviceIdField;
 		private readonly List<InputFeatureUsage> usages = new List<InputFeatureUsage>();
-		
+
+
 		public override string GetInfo()
 		{
+			if (!enabled) return "";
 			var list = new List<InputDevice>();
 			InputDevices.GetDevices(list);
 

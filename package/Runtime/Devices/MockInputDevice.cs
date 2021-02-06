@@ -205,7 +205,7 @@ namespace needle.weaver.webxr
 		{
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 			if (DebugLog)
-				Debug.Log(Name + " - " + Node + " - Try Get Usage " + name + " - " + typeof(T));
+				Debug.LogFormat(LogType.Log, LogOption.None, null,Name + " - " + Node + " - Try Get Usage " + name + " - " + typeof(T));
 #endif
 			foreach (var kvp in _registry)
 			{
@@ -247,6 +247,11 @@ namespace needle.weaver.webxr
 				tracked = true
 			};
 			states.Add(state);
+			
+			#if UNITY_EDITOR || DEVELOPMENT_BUILD
+			if(DebugLog)
+				Debug.LogFormat(LogType.Log, LogOption.None, null, "GET NODES " + Name);
+			#endif
 
 			foreach (var node in _xrNodeUsages)
 			{

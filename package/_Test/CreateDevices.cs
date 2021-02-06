@@ -12,6 +12,7 @@ namespace needle.weaver.webxr
 	{
 		private static Quaternion _rotation = Quaternion.identity;
 		private List<MockInputDevice> devices = new List<MockInputDevice>();
+		public bool UpdateDevices;
 
 		private void Awake()
 		{
@@ -20,21 +21,17 @@ namespace needle.weaver.webxr
 			InputSystem.RegisterLayout<XRHMD>();
 			InputSystem.RegisterLayout<XRController>();
 			InputSystem.RegisterLayout<OpenVRControllerWMR>();
-			
+
 			var headset = MockDeviceBuilder.CreateHeadset(
-					() => true,
-					() => Vector3.LerpUnclamped(new Vector3(0,0,-.5f), Vector3.up * .2f, Mathf.Sin(Time.time)),
-					() => _rotation
-				).Connect();
+				() => true,
+				() => Vector3.LerpUnclamped(new Vector3(0, 0, -.5f), Vector3.up * .2f, Mathf.Sin(Time.time)),
+				() => _rotation
+			).Connect();
 			devices.Add(headset);
-			
+
 			var rightController = MockDeviceBuilder.CreateRightController(
 				() => true,
-				() =>
-				{
-					// Debug.Log("READ POSITION RIGHT");
-					return Vector3.LerpUnclamped(Vector3.zero, Vector3.down * .2f, Mathf.Sin(Time.time * 2f));
-				},
+				() => Vector3.LerpUnclamped(Vector3.zero, Vector3.down * .2f, Mathf.Sin(Time.time * 2f)),
 				() => Quaternion.Euler(20, 20, 20));
 			rightController.AddFeature(CommonUsages.trigger, () => Random.value);
 			rightController.AddFeature(CommonUsages.triggerButton, () => Random.value > .5f);
@@ -45,14 +42,14 @@ namespace needle.weaver.webxr
 			rightController.AddFeature(CommonUsages.gripButton, () => Random.value > .5f);
 			rightController.Connect();
 			devices.Add(rightController);
-			
+
 			var leftController = MockDeviceBuilder.CreateLeftController(
 				() => true,
 				() => Vector3.LerpUnclamped(Vector3.zero, Vector3.right * .5f, Mathf.Sin(Time.time * 5f)),
 				() => Quaternion.identity);
 			leftController.Connect();
 			devices.Add(leftController);
-			
+
 			InputSubsystemAPI.SetSupportedTrackingMode(TrackingOriginModeFlags.Device | TrackingOriginModeFlags.Floor);
 			XRDisplaySubsystem_Patch.Instance.Stop();
 		}
@@ -60,8 +57,10 @@ namespace needle.weaver.webxr
 		private void Update()
 		{
 			_rotation = Quaternion.Lerp(Quaternion.Euler(0, -20, 0), Quaternion.Euler(0, 20, 0), Mathf.Sin(Time.time) * .5f + .5f);
-			
-			foreach(var dev in devices) dev.UpdateDevice();
+
+			if (UpdateDevices)
+				foreach (var dev in devices)
+					dev.UpdateDevice();
 		}
 	}
 }

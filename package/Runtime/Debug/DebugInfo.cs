@@ -8,6 +8,10 @@ namespace needle.weaver.webxr
 	{
 		public abstract string GetInfo();
 		
+		private void OnEnable()
+		{
+			
+		}
 
 		public virtual void GetActions(List<ButtonAction> list)
 		{
