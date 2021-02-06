@@ -60,31 +60,33 @@ namespace needle.weaver.webxr
 		}
 
 
-		public void Connect()
+		public MockInputDevice Connect()
 		{
 #if UNITY_INPUT_SYSTEM
 			InputSystem.EnableDevice(this.device);
 			device.MakeCurrent();
 #endif
-			
-			if (XRInputSubsystem_Patch.InputDevices.Contains(this)) return;
+
+			if (XRInputSubsystem_Patch.InputDevices.Contains(this)) return this;
 			XRInputSubsystem_Patch.InputDevices.Add(this);
 #if DEVELOPMENT_BUILD
 			Debug.Log("Registered input device " + this.Id + " - " + this.Node);
 #endif
+			return this;
 		}
 
-		public void Disconnect()
+		public MockInputDevice Disconnect()
 		{
 #if UNITY_INPUT_SYSTEM
 			InputSystem.DisableDevice(this.device);
 #endif
-			
-			if (!XRInputSubsystem_Patch.InputDevices.Contains(this)) return;
+
+			if (!XRInputSubsystem_Patch.InputDevices.Contains(this)) return this;
 			XRInputSubsystem_Patch.InputDevices.Remove(this);
 #if DEVELOPMENT_BUILD
 			Debug.Log("Removed input device " + this.Id + " - " + this.Node);
 #endif
+			return this;
 		}
 
 #if UNITY_INPUT_SYSTEM
@@ -296,7 +298,8 @@ namespace needle.weaver.webxr
 			{
 				try
 				{
-					var log = string.Join("\n", states.Select(s => s.nodeType + " - " + s.uniqueID + " - " + s));
+					var info = states.Select(s => s.nodeType + " - " + s.uniqueID + " - " + s);
+					var log = string.Join("\n", info);
 					Debug.Log(Name + ", " + Id + "\n" + log);
 				}
 				catch

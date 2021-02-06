@@ -35,8 +35,9 @@ namespace needle.weaver.webxr
 			if (!isRunning) return;
 			isRunning = false;
 			DetachDisplayBehaviour();
-			Debug.Log($"Stopped {this} - Behaviours:\n" + string.Join("\n", availableBehaviours) + "\n" + 
-			          "Any active? " + (CurrentBehaviour != null));
+			Debug.Log($"Stopped {this} - Behaviours:\n" 
+			          + (availableBehaviours != null ? string.Join("\n", availableBehaviours) : "No Available Behaviours") 
+			          + "\nAny active? " + (CurrentBehaviour != null));
 		}
 
 		public void OnDestroy()
