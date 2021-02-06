@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Unity.XR.OpenVR;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
 using UnityEngine.XR;
+using Utils;
 using CommonUsages = UnityEngine.XR.CommonUsages;
+using Random = UnityEngine.Random;
 
 namespace needle.weaver.webxr
 {
@@ -52,15 +55,29 @@ namespace needle.weaver.webxr
 
 			InputSubsystemAPI.SetSupportedTrackingMode(TrackingOriginModeFlags.Device | TrackingOriginModeFlags.Floor);
 			XRDisplaySubsystem_Patch.Instance.Stop();
+
+		}
+
+		private void OnEnable()
+		{
+			PlayerLoopHelper.AddUpdateCallback(this, this.CustomUpdate, PlayerLoopHelper.Stages.PostLateUpdate);
+		}
+
+		private void OnDisable()
+		{
+			PlayerLoopHelper.RemoveUpdateDelegate(this, this.CustomUpdate);
+		}
+
+		private void CustomUpdate()
+		{
+			if (UpdateDevices)
+				foreach (var dev in devices)
+					dev.UpdateDevice();
 		}
 
 		private void Update()
 		{
 			_rotation = Quaternion.Lerp(Quaternion.Euler(0, -20, 0), Quaternion.Euler(0, 20, 0), Mathf.Sin(Time.time) * .5f + .5f);
-
-			if (UpdateDevices)
-				foreach (var dev in devices)
-					dev.UpdateDevice();
 		}
 	}
 }
