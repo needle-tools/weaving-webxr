@@ -49,6 +49,7 @@ namespace needle.weaver.webxr
 					}
 
 					target = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.Default, 0);
+					target.antiAliasing = QualitySettings.antiAliasing;
 					SetupRenderTarget(target);
 					target.Create();
 				}
@@ -68,6 +69,7 @@ namespace needle.weaver.webxr
 			}
 
 			var t = new RenderTexture(expectedWidth, expectedHeight, 24);
+			t.antiAliasing = QualitySettings.antiAliasing;
 			t.name = name;
 			t.Create();
 #if DEVELOPMENT_BUILD

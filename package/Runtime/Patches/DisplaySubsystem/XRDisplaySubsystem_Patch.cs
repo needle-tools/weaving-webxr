@@ -199,7 +199,7 @@ namespace needle.weaver.webxr
 
 		public new void SetMSAALevel(int level)
 		{
-			// TODO
+			// CurrentBehaviour?.SetMSAALevel(level);
 		}
 	}
 }
