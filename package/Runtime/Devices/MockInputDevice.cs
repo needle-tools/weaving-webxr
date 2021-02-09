@@ -162,7 +162,7 @@ namespace needle.weaver.webxr
 		public void AddFeature<T>(InputFeatureUsage<T> usage, Func<T> getValue, XRNodeUsage xrNodeUsage = null)
 		{
 #if UNITY_INPUT_SYSTEM
-			newInputSystemControls.Clear();
+			newInputSystemControls?.Clear();
 #endif
 
 			var usg = (InputFeatureUsage) usage;
