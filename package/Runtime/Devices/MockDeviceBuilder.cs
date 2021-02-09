@@ -10,12 +10,9 @@ namespace needle.weaver.webxr
 	{
 		public static MockInputDevice CreateHeadset(Func<bool> isTrackedCallback, Func<Vector3> positionCallback, Func<Quaternion> rotationCallback, Func<InputTrackingState> stateCallback = null, Func<Vector3> leftEyePositionCallback = null, Func<Quaternion> leftEyeRotationCallback = null, Func<Vector3> rightEyePositionCallback = null, Func<Quaternion> rightEyeRotationCallback = null)
 		{
-			var device = new MockInputDevice("<XRHMD>", XRNode.Head, "XRHMD")
-			{
-				SerialNumber = "1.0.0",
-				Manufacturer = "Needle",
-				DeviceCharacteristics = InputDeviceCharacteristics.HeadMounted | InputDeviceCharacteristics.TrackedDevice
-			};
+			var device = new MockInputDevice("<XRHMD>", 
+				InputDeviceCharacteristics.HeadMounted | InputDeviceCharacteristics.TrackedDevice,
+				XRNode.Head, "XRHMD");
 
 			device.AddFeature(CommonUsages.isTracked, isTrackedCallback);
 			device.AddFeature(CommonUsages.trackingState,  stateCallback ?? (() => InputTrackingState.Position | InputTrackingState.Rotation));
@@ -42,13 +39,10 @@ namespace needle.weaver.webxr
 		
 		private static MockInputDevice CreateController(XRNode node, Func<bool> isTrackedCallback, Func<Vector3> positionCallback, Func<Quaternion> rotationCallback, Func<InputTrackingState> stateCallback = null)
 		{
-			var device = new MockInputDevice("<XRController>", node, nameof(XRController))
-			{
-				SerialNumber = "1.0.0",
-				Manufacturer = "Needle",
-				DeviceCharacteristics = InputDeviceCharacteristics.TrackedDevice | InputDeviceCharacteristics.HeldInHand
-			};
-
+			var device = new MockInputDevice("<XRController>",
+				InputDeviceCharacteristics.TrackedDevice | InputDeviceCharacteristics.HeldInHand,
+				node,
+				nameof(XRController));
 			device.AddFeature(CommonUsages.isTracked, isTrackedCallback);
 			device.AddFeature(CommonUsages.trackingState, stateCallback ?? (() => InputTrackingState.Position | InputTrackingState.Rotation));
 			device.AddFeature(CommonUsages.devicePosition, positionCallback);

@@ -30,26 +30,34 @@ namespace needle.weaver.webxr
 	{
 		public ulong Id { get; }
 		public string Name { get; private set; }
-		public string Manufacturer { get; set; }
-		public string SerialNumber { get; set; }
+		public string Manufacturer { get; set; } = "Needle";
+		public string SerialNumber { get; set; } = "1.0.0";
 		public bool DebugLog = false;
+		public string Layout { get; private set; }
 
 		public XRNode Node { get; }
 		public InputDeviceCharacteristics DeviceCharacteristics { get; set; }
 
 		private static ulong _idCounter = 0;
 
-		public MockInputDevice(string name, XRNode node, string layoutName)
+		public MockInputDevice(string name, InputDeviceCharacteristics characteristics, XRNode node, string layoutName)
 		{
 			this.Id = _idCounter++;
 			this.Name = name;
+			this.DeviceCharacteristics = characteristics;
 			this.Node = node;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
 			Debug.Log("Created new MockDevice: " + name + ", id=" + Id);
+#endif
 
-			
+			this.Layout = layoutName;
+
 #if UNITY_INPUT_SYSTEM
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+			Debug.Log("Add device " + name + " with layout " + layoutName);
+#endif
 			device = InputSystem.AddDevice(layoutName, name, null);
-			if(node == XRNode.LeftHand)
+			if (node == XRNode.LeftHand)
 				InputSystem.AddDeviceUsage(device, UnityEngine.InputSystem.CommonUsages.LeftHand);
 			else if (node == XRNode.RightHand)
 				InputSystem.AddDeviceUsage(device, UnityEngine.InputSystem.CommonUsages.RightHand);
@@ -123,10 +131,11 @@ namespace needle.weaver.webxr
 #endif
 							continue;
 						}
+
 						newInputSystemControls.Add((control, kvp.Value));
 					}
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-					Debug.Log("Found " + newInputSystemControls.Count + " controls for " + this.Name +"\n" + string.Join("\n", newInputSystemControls));
+					Debug.Log("Found " + newInputSystemControls.Count + " controls for " + this.Name + "\n" + string.Join("\n", newInputSystemControls));
 #endif
 				}
 
@@ -205,7 +214,7 @@ namespace needle.weaver.webxr
 		{
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 			if (DebugLog)
-				Debug.LogFormat(LogType.Log, LogOption.None, null,Name + " - " + Node + " - Try Get Usage " + name + " - " + typeof(T));
+				Debug.LogFormat(LogType.Log, LogOption.None, null, Name + " - " + Node + " - Try Get Usage " + name + " - " + typeof(T));
 #endif
 			foreach (var kvp in _registry)
 			{
@@ -247,11 +256,11 @@ namespace needle.weaver.webxr
 				tracked = true
 			};
 			states.Add(state);
-			
-			#if UNITY_EDITOR || DEVELOPMENT_BUILD
-			if(DebugLog)
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+			if (DebugLog)
 				Debug.LogFormat(LogType.Log, LogOption.None, null, "GET NODES " + Name);
-			#endif
+#endif
 
 			foreach (var node in _xrNodeUsages)
 			{
