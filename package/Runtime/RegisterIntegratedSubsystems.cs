@@ -50,6 +50,7 @@ namespace needle.weaver.webxr
 				.FirstOrDefault(t => t.FullName == "UnityEngine.Internal_SubsystemInstances");
 			var field = type?.GetField("s_IntegratedSubsystemInstances", (BindingFlags) ~0);
 #endif
+			// ReSharper disable once ConditionIsAlwaysTrueOrFalse
 			if (type == null) Debug.LogError("Could not get type for integrated subsystems");
 			else if (field == null) Debug.LogError("Could not get field for integrated subsystems list");
 			var list = field?.GetValue(null) as IList;
@@ -75,7 +76,8 @@ namespace needle.weaver.webxr
 		{
 #if UNITY_2020_2_OR_NEWER
 			var type = typeof(SubsystemDescriptorStore);
-			var list = type?.GetField("s_IntegratedDescriptors", (BindingFlags) ~0)?.GetValue(null) as List<IntegratedSubsystemDescriptor>;
+			var listField = type?.GetField("s_IntegratedDescriptors", (BindingFlags) ~0);
+			var list = listField?.GetValue(null) as List<IntegratedSubsystemDescriptor>;
 #else
 			var type = AppDomain.CurrentDomain
 				.GetAssemblies()
@@ -84,6 +86,7 @@ namespace needle.weaver.webxr
 			var listField = type?.GetField("s_IntegratedSubsystemDescriptors", (BindingFlags) ~0);
 			var list = listField?.GetValue(null) as IList;
 #endif
+			// ReSharper disable once ConditionIsAlwaysTrueOrFalse
 			if (type == null) Debug.LogError("Could not get subsystem descriptor store");
 			else if (listField == null) Debug.LogError("Failed getting integrated subsystem descriptors field");
 			else if (list == null) Debug.LogError("Failed getting integrated subsystem descriptors list");
