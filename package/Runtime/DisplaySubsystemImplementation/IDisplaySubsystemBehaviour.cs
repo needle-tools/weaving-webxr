@@ -13,7 +13,7 @@ namespace needle.weaver.webxr
 		
 		void SetPreferredMirrorBlitMode(int blitMode);
 		RenderTexture GetRenderTextureForRenderPass(int renderPass);
-		void SetMSAALevel(int level);
+		void OnSetMSAALevel(int level);
 		void SetFocusPlane_Injected(
 			ref Vector3 point,
 			ref Vector3 normal,

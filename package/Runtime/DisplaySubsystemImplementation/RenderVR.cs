@@ -87,12 +87,12 @@ namespace needle.weaver.webxr
 			blitParameter = bp;
 		}
 
-		public override void SetMSAALevel(int level)
+		public override void OnSetMSAALevel(int level)
 		{
 			foreach (var t in camTargets)
 				t.antiAliasing = level;
 			
-			base.SetMSAALevel(level);
+			base.OnSetMSAALevel(level);
 		}
 	}
 }

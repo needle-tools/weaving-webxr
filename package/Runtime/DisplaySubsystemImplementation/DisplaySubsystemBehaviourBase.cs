@@ -192,7 +192,7 @@ namespace needle.weaver.webxr
 		public virtual int OnGetRenderParameterCount(ref XRDisplaySubsystem.XRRenderPass pass) => 1;
 		public virtual bool displayOpaque => true;
 		
-		public virtual void SetMSAALevel(int level)
+		public virtual void OnSetMSAALevel(int level)
 		{
 		}
 
