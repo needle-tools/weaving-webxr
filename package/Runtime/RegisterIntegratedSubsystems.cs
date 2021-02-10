@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Net.Mime;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SubsystemsImplementation;
@@ -11,13 +12,11 @@ namespace needle.weaver.webxr
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
 		private static void Init()
 		{
-#if UNITY_EDITOR
-			if (Application.isPlaying)
+			if (Application.isPlaying && Application.isEditor)
 			{
 				Debug.Log("Would inject subsystem in webgl build but not in editor");
 				return;
 			}
-#endif
 			
 #if !UNITY_EDITOR && UNITY_WEBGL
 			RegisterSubsystems();
@@ -45,10 +44,13 @@ namespace needle.weaver.webxr
 
 			var ml = new List<ISubsystem>();
 			SubsystemManager.GetInstances(ml);
-			if (ml.Count <= 0) Debug.LogError("Failed adding Subsystem for webgl support");
+			if (ml.Count <= 0)
+			{
+				Debug.LogError("Failed adding Subsystem for webgl support");
+			}
 			else
 			{
-				Debug.Log($"Registered subsystems successfully:\n" + string.Join("\n", Subsystems()));
+				if(Debug.isDebugBuild) Debug.Log($"Registered subsystems successfully:\n" + string.Join("\n", Subsystems()));
 			}
 		}
 
@@ -64,7 +66,7 @@ namespace needle.weaver.webxr
 					{
 						if(desc != null)
 						{
-							Debug.Log("Registered Descriptor: " + desc + ", id=" + desc.id);
+							if(Debug.isDebugBuild) Debug.Log("Registered Descriptor: " + desc + ", id=" + desc.id);
 							list.Add(desc);
 							// check if actually added:
 							var inList = new List<IntegratedSubsystemDescriptor>();
@@ -74,11 +76,10 @@ namespace needle.weaver.webxr
 								Debug.LogError("Failed adding subsystem descriptor");
 								return false;
 							}
-
-							Debug.Log("Successfully added " + desc.id);
+							if(Debug.isDebugBuild) Debug.Log("Successfully added " + desc.id);
 							return true;
 						}
-						Debug.LogError("Descriptor is null");
+						if(Debug.isDebugBuild) Debug.LogError("Descriptor is null");
 						return false;
 					}
 
@@ -98,7 +99,7 @@ namespace needle.weaver.webxr
 
 			if (list?.Count <= 0)
 			{
-				Debug.LogWarning("No subsystem descriptors added");
+				if(Debug.isDebugBuild) Debug.LogWarning("No subsystem descriptors added");
 			}
 		}
 	}

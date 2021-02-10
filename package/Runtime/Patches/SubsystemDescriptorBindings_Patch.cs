@@ -11,25 +11,22 @@ namespace needle.weaver.webxr
 		// called from IntegratedSubsystemDescriptor<TSubsystem> 
 		public static IntPtr Create(IntPtr descriptorPtr)
 		{
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-			Debug.Log("Search descriptor binding: " + descriptorPtr);
-#endif
+			if(Debug.isDebugBuild)
+				Debug.Log("Search descriptor binding: " + descriptorPtr);
 
 			foreach (var man in ManagedBinding.Instances)
 			{
 				if (man == null) continue;
 				if (man.DescriptorPointer == descriptorPtr)
 				{
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-					Debug.Log("Found Descriptor Binding: " + descriptorPtr + " -> " + man);
-#endif
+					if(Debug.isDebugBuild)
+						Debug.Log("Found Descriptor Binding: " + descriptorPtr + " -> " + man);
 					return man.SubsystemPointer;
 				}
 			}
 
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-			Debug.LogError("Could not find binding for descriptor: " + descriptorPtr);
-#endif
+			if(Debug.isDebugBuild)			
+				Debug.LogError("Could not find binding for descriptor: " + descriptorPtr);
 			return IntPtr.Zero;
 		}
 	}
