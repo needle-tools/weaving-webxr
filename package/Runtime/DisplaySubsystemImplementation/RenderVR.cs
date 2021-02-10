@@ -35,6 +35,11 @@ namespace needle.weaver.webxr
 
 		protected override void SetupRenderTarget(RenderTexture texture)
 		{
+			if (!SystemInfo.supports2DArrayTextures)
+			{
+				// TODO: add support for non 2d array fallback
+				Debug.LogError("2d Texture arrays are not supported, did you build in WebGL 1?");
+			}
 			// texture.depth = 2;
 			texture.dimension = TextureDimension.Tex2DArray;
 			// texture.volumeDepth = 2;
