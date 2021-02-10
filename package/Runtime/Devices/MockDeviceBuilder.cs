@@ -1,8 +1,10 @@
 using System;
-using Unity.XR.OpenVR;
 using UnityEngine;
-using UnityEngine.InputSystem.XR;
 using UnityEngine.XR;
+#if UNITY_INPUT_SYSTEM
+using Unity.XR.OpenVR;
+using UnityEngine.InputSystem.XR;
+#endif
 
 namespace needle.weaver.webxr
 {
@@ -42,7 +44,7 @@ namespace needle.weaver.webxr
 			var device = new MockInputDevice("<XRController>",
 				InputDeviceCharacteristics.TrackedDevice | InputDeviceCharacteristics.HeldInHand,
 				node,
-				nameof(XRController));
+				"XRController");
 			device.AddFeature(CommonUsages.isTracked, isTrackedCallback);
 			device.AddFeature(CommonUsages.trackingState, stateCallback ?? (() => InputTrackingState.Position | InputTrackingState.Rotation));
 			device.AddFeature(CommonUsages.devicePosition, positionCallback);

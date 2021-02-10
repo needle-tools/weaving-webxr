@@ -24,7 +24,9 @@ namespace needle.weaver.webxr
 		bool TryGetCullingParams(Camera camera, int cullingPassIndex, out ScriptableCullingParameters scriptableCullingParameters);
 		bool TryGetRenderPass(int renderPassIndex, out XRDisplaySubsystem.XRRenderPass renderPass);
 		int GetRenderPassCount();
+#if UNITY_2020_2_OR_NEWER
 		XRDisplaySubsystem.TextureLayout textureLayout { get; }
+#endif
 		float scaleOfAllRenderTargets { get; }
 		float scaleOfAllViewports { get; }
 		bool displayOpaque { get; }

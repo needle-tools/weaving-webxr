@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
-using System.Net.Mime;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.SubsystemsImplementation;
 // ReSharper disable UnusedMember.Local
+
+#if UNITY_2020_2_OR_NEWER
+using UnityEngine.SubsystemsImplementation;
+#endif
 
 namespace needle.weaver.webxr
 {
@@ -56,8 +59,13 @@ namespace needle.weaver.webxr
 
 		private static void RegisterDescriptors()
 		{
+#if UNITY_2020_2_OR_NEWER
 			var descriptorStore = typeof(SubsystemDescriptorStore);
-			var list = descriptorStore.GetField("s_IntegratedDescriptors", (BindingFlags) ~0)?.GetValue(null) as List<IntegratedSubsystemDescriptor>;
+			var list = descriptorStore?.GetField("s_IntegratedDescriptors", (BindingFlags) ~0)?.GetValue(null) as List<IntegratedSubsystemDescriptor>;
+#else
+			var descriptorStore = Type.GetType("UnityEngine.Internal_SubsystemDescriptors");
+			var list = descriptorStore?.GetField("s_IntegratedSubsystemDescriptors", (BindingFlags) ~0)?.GetValue(null) as List<IntegratedSubsystemDescriptor>;
+#endif
 			if (list != null)
 			{
 				foreach (var sub in Subsystems())

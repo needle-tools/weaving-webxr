@@ -1,8 +1,5 @@
 ﻿using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 using UnityEngine.Rendering;
 using UnityEngine.XR;
 
@@ -28,6 +25,7 @@ namespace needle.weaver.webxr
 #endif
 					return null;
 				}
+
 				_originalProjectionMatrix = _mainCamera.projectionMatrix;
 				Debug.Log(_originalProjectionMatrix);
 				return _mainCamera;
@@ -83,7 +81,7 @@ namespace needle.weaver.webxr
 			if (!cam)
 			{
 				if (projection == Matrix4x4.zero) return;
-				
+
 				if (!MainCamera) return;
 
 				var go = new GameObject(name);
@@ -114,6 +112,7 @@ namespace needle.weaver.webxr
 			{
 				Debug.LogWarning("Called OnAttach while already attached: " + this + ", CurrentProvider: " + this.provider + ", attach: " + prov);
 			}
+
 			this.provider = prov;
 			EnsureTextures();
 		}
@@ -122,7 +121,7 @@ namespace needle.weaver.webxr
 		{
 			if (prov != provider) return;
 			provider = null;
-			
+
 			if (_originalProjectionMatrix != Matrix4x4.zero && MainCamera)
 			{
 				var components = MainCamera.GetComponents<Behaviour>().Where(b => !(b is Camera)).ToArray();
@@ -133,6 +132,7 @@ namespace needle.weaver.webxr
 					// Debug.Log("disable " + comp);
 					comp.enabled = false;
 				}
+
 				c.Callback = () =>
 				{
 					// Debug.Log("Set main camera projection matrix\n" + _originalProjectionMatrix);
@@ -142,13 +142,13 @@ namespace needle.weaver.webxr
 				};
 			}
 		}
-		
+
 		public virtual void Dispose()
 		{
 			if (target) target.Release();
 			target = null;
 		}
-		
+
 		public virtual void SetPreferredMirrorBlitMode(int blitMode)
 		{
 		}
@@ -169,7 +169,7 @@ namespace needle.weaver.webxr
 		{
 			return camera.TryGetCullingParameters(true, out scriptableCullingParameters);
 		}
-		
+
 		public virtual bool TryGetRenderPass(int renderPassIndex, out XRDisplaySubsystem.XRRenderPass renderPass)
 		{
 			// Debug.Log("get RenderPass " + renderPassIndex);
@@ -187,11 +187,11 @@ namespace needle.weaver.webxr
 		public virtual int GetRenderPassCount() => 1;
 		public virtual float scaleOfAllRenderTargets => 1;
 		public virtual float scaleOfAllViewports => 1;
-		
+
 		public virtual RenderTexture GetRenderTextureForRenderPass(int renderPass) => RenderPassTexture;
 		public virtual int OnGetRenderParameterCount(ref XRDisplaySubsystem.XRRenderPass pass) => 1;
 		public virtual bool displayOpaque => true;
-		
+
 		public virtual void OnSetMSAALevel(int level)
 		{
 		}
@@ -199,15 +199,14 @@ namespace needle.weaver.webxr
 		public virtual void SetFocusPlane_Injected(ref Vector3 point, ref Vector3 normal, ref Vector3 velocity)
 		{
 		}
-		
+
 
 		public abstract XRDisplaySubsystem.XRMirrorViewBlitDesc GetMirrorViewBlitDesc();
+#if UNITY_2020_2_OR_NEWER
 		public abstract XRDisplaySubsystem.TextureLayout textureLayout { get; }
+#endif
 		public abstract void OnGetBlitParameter(int blitParameterIndex, out XRDisplaySubsystem.XRBlitParams blitParameter);
 
 		protected abstract void EnsureTextures();
-		
-		
-
 	}
 }

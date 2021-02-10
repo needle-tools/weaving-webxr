@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.XR;
+using Debug = UnityEngine.Debug;
+#if UNITY_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.XR;
-using UnityEngine.XR;
-using CommonUsages = UnityEngine.XR.CommonUsages;
-using Debug = UnityEngine.Debug;
 using InputDevice = UnityEngine.InputSystem.InputDevice;
+#endif
 
 namespace needle.weaver.webxr
 {

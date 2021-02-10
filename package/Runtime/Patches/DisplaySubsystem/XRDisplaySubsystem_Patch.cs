@@ -35,8 +35,8 @@ namespace needle.weaver.webxr
 			if (!isRunning) return;
 			isRunning = false;
 			DetachDisplayBehaviour();
-			Debug.Log($"Stopped {this} - Behaviours:\n" 
-			          + (availableBehaviours != null ? string.Join("\n", availableBehaviours) : "No Available Behaviours") 
+			Debug.Log($"Stopped {this} - Behaviours:\n"
+			          + (availableBehaviours != null ? string.Join("\n", availableBehaviours) : "No Available Behaviours")
 			          + "\nAny active? " + (CurrentBehaviour != null));
 		}
 
@@ -116,7 +116,7 @@ namespace needle.weaver.webxr
 
 		public new float scaleOfAllRenderTargets => CurrentBehaviour?.scaleOfAllRenderTargets ?? 1;
 
-
+#if UNITY_2020_2_OR_NEWER
 		public new TextureLayout textureLayout => isRunning ? CurrentBehaviour?.textureLayout ?? 0 : TextureLayout.SingleTexture2D;
 
 		public new TextureLayout supportedTextureLayouts
@@ -130,6 +130,7 @@ namespace needle.weaver.webxr
 				return layout;
 			}
 		}
+#endif
 
 		public new int GetRenderPassCount() => isRunning && CurrentBehaviour != null ? renderPassCount : 0;
 

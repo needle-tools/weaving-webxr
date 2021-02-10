@@ -71,9 +71,11 @@ namespace needle.weaver.webxr
 			var outDesc = new XRDisplaySubsystem.XRMirrorViewBlitDesc {blitParamsCount = blitCount};
 			return outDesc;
 		}
-		
+
+#if UNITY_2020_2_OR_NEWER
 		public override XRDisplaySubsystem.TextureLayout textureLayout => XRDisplaySubsystem.TextureLayout.Texture2DArray;
-		
+#endif
+
 		public override void OnGetBlitParameter(int blitParameterIndex,
 			out XRDisplaySubsystem.XRBlitParams blitParameter)
 		{
@@ -91,7 +93,7 @@ namespace needle.weaver.webxr
 		{
 			foreach (var t in camTargets)
 				t.antiAliasing = level;
-			
+
 			base.OnSetMSAALevel(level);
 		}
 	}
