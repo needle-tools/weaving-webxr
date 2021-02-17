@@ -32,7 +32,7 @@ namespace needle.weaver.webxr
 			}
 		}
 
-		private RenderTexture RenderPassTexture
+		protected RenderTexture RenderPassTexture
 		{
 			get
 			{
@@ -80,8 +80,7 @@ namespace needle.weaver.webxr
 		{
 			if (!cam)
 			{
-				if (projection == Matrix4x4.zero) return;
-
+				if (projection != Matrix4x4.zero) return;
 				if (!MainCamera) return;
 
 				var go = new GameObject(name);
