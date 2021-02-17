@@ -9,6 +9,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.XR;
 using InputDevice = UnityEngine.InputSystem.InputDevice;
+
 #endif
 
 namespace needle.weaver.webxr
@@ -143,6 +144,7 @@ namespace needle.weaver.webxr
 				// loop input controls to update values
 				foreach (var (control, callback) in newInputSystemControls)
 				{
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
 					try
 					{
 						control.WriteValueFromObjectIntoEvent(ptr, callback.DynamicInvoke());
@@ -151,6 +153,9 @@ namespace needle.weaver.webxr
 					{
 						Debug.LogException(e);
 					}
+#else
+					control.WriteValueFromObjectIntoEvent(ptr, callback.DynamicInvoke());
+#endif
 				}
 
 				InputSystem.QueueEvent(ptr);
