@@ -18,16 +18,15 @@ namespace needle.weaver.webxr
 				if (_mainCamera) return _mainCamera;
 				_mainCamera = Camera.main;
 				if (!_mainCamera) _mainCamera = Object.FindObjectOfType<Camera>();
-				if (!_mainCamera)
+				if (!_mainCamera || _mainCamera == null)
 				{
 #if DEVELOPMENT_BUILD
-					Debug.Log("No camera found");
+					Debug.Log("No camera found. " + this);
 #endif
 					return null;
 				}
 
 				_originalProjectionMatrix = _mainCamera.projectionMatrix;
-				Debug.Log(_originalProjectionMatrix);
 				return _mainCamera;
 			}
 		}
@@ -178,7 +177,7 @@ namespace needle.weaver.webxr
 				renderTargetDesc = RenderPassTexture.descriptor,
 				shouldFillOutDepth = true,
 				cullingPassIndex = 0,
-				renderPassIndex = renderPassIndex
+				renderPassIndex = renderPassIndex,
 			};
 			return true;
 		}

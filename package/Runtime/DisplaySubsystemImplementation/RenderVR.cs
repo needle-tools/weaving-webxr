@@ -36,33 +36,40 @@ namespace needle.weaver.webxr
 
 		public override bool TryGetCullingParams(Camera camera, int cullingPassIndex, out ScriptableCullingParameters scriptableCullingParameters)
 		{
+			camera.SetStereoProjectionMatrix(Camera.StereoscopicEye.Left, provider.ProjectionLeft);
+			camera.SetStereoProjectionMatrix(Camera.StereoscopicEye.Right, provider.ProjectionRight);
+			camera.stereoSeparation = 0.032f;
+			
 			var res = base.TryGetCullingParams(camera, cullingPassIndex, out scriptableCullingParameters);
-			scriptableCullingParameters.stereoSeparationDistance = 0.032f;
+			// scriptableCullingParameters.stereoSeparationDistance = 0.032f;
 			return res;
 		}
-	
-		
-		
+
+		public override bool TryGetRenderPass(int renderPassIndex, out XRDisplaySubsystem.XRRenderPass renderPass)
+		{
+			return base.TryGetRenderPass(renderPassIndex, out renderPass);
+		}
+
+
+		public override int OnGetRenderParameterCount(ref XRDisplaySubsystem.XRRenderPass pass) => 2;
+
 		public override void OnGetRenderParameter(ref XRDisplaySubsystem.XRRenderPass pass, Camera camera, int renderParameterIndex,
 			out XRDisplaySubsystem.XRRenderParameter renderParameter)
 		{
-			// camera.SetStereoProjectionMatrix(Camera.StereoscopicEye.Left, provider.ProjectionLeft);
-			// camera.SetStereoProjectionMatrix(Camera.StereoscopicEye.Right, provider.ProjectionRight);
-			
 			renderParameter = new XRDisplaySubsystem.XRRenderParameter
 			{
 				projection = renderParameterIndex == 0 ? provider.ProjectionLeft : provider.ProjectionRight,
-				viewport = new Rect(0, 0, .5f, 1),
+				viewport = new Rect(renderParameterIndex == 0 ? 0 : .5f, 0, .5f, 1),
 				textureArraySlice = renderParameterIndex,
-				view = camera.worldToCameraMatrix
+				view = camera.worldToCameraMatrix,
 			};
 		}
 
 		protected override void SetupRenderTarget(RenderTexture texture)
 		{
 			// texture.depth = 2;
-			texture.dimension = TextureDimension.Tex2DArray;
-			texture.volumeDepth = 2;
+			// texture.dimension = TextureDimension.Tex2DArray;
+			// texture.volumeDepth = 2;
 			// texture.volumeDepth = 2;
 		}
 
@@ -88,7 +95,13 @@ namespace needle.weaver.webxr
 			// right = null;
 		}
 
-		public override int GetRenderPassCount() => 2;
+		// public override int GetRenderPassCount() => 2;
+
+		public override void SetPreferredMirrorBlitMode(int blitMode)
+		{
+			Debug.Log(blitMode);
+			base.SetPreferredMirrorBlitMode(blitMode);
+		}
 
 		public override XRDisplaySubsystem.XRMirrorViewBlitDesc GetMirrorViewBlitDesc()
 		{
@@ -103,7 +116,7 @@ namespace needle.weaver.webxr
 		}
 
 #if UNITY_2020_2_OR_NEWER
-		public override XRDisplaySubsystem.TextureLayout textureLayout => XRDisplaySubsystem.TextureLayout.Texture2DArray;
+		public override XRDisplaySubsystem.TextureLayout textureLayout => XRDisplaySubsystem.TextureLayout.SingleTexture2D;
 #endif
 
 		public override void OnGetBlitParameter(int blitParameterIndex,
@@ -112,8 +125,10 @@ namespace needle.weaver.webxr
 			EnsureTextures();
 			var bp = new XRDisplaySubsystem.XRBlitParams();
 			bp.srcRect = new Rect(0, 0, 1, 1);
+			// var x = blitParameterIndex == 0 ? 0 : .5f;
+			// bp.destRect = new Rect(x, 0, .5f, 1);
 			bp.destRect = new Rect(0, 0, 1, 1);
-			bp.srcTexArraySlice = 0;
+			bp.srcTexArraySlice = 0;// Time.frameCount % 2;
 			bp.srcTex = RenderPassTexture;
 			blitParameter = bp;
 			// var width = .5f;
