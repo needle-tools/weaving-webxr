@@ -1,7 +1,7 @@
 {
   "name": "com.needle.weaver.webxr",
-  "displayName": "needle XRInput WebGL",
-  "version": "0.0.1-preview",
+  "displayName": "Needle WebXR Plugin",
+  "version": "0.1.0-pre",
   "unity": "2019.4",
   "description": "",
   "author": {
@@ -10,7 +10,7 @@
     "url": "https://needle.tools"
   },
   "dependencies": {
-    "com.needle.weaver" : "0.0.1-preview"
+    "com.needle.weaver" : "0.1.0-pre"
   },
   "samples": [
   ]
